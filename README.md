@@ -5,7 +5,7 @@ Create a new wordpress plugin in 3 seconds using GruntJS.
 
 ### First Time Setup
 
-If you dont have NodeJS and grunt already installed on your PC then follow these instructions, otherwise proceed to next section.
+If you don't have NodeJS and grunt already installed on your PC then follow these instructions, otherwise proceed to next section.
 
 1. Install [NodeJS](http://nodejs.org#download).
 
@@ -25,8 +25,7 @@ This setup is required only once.
 
 ### Generating Wordpress Plugin
 1. Duplicate file `build-sample.json` as `build.json`
-2. Fill in values in `build.json`. You should at-least give the values for 
-
+2. Fill in values in `build.json`. You should at-least give the values for "plugin-name", "author-name", "author-email"
 3. Type the following in the repository root directory:
 
 ```

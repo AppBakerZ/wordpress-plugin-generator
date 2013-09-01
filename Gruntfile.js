@@ -1,4 +1,10 @@
 "use strict;"
+/**************************************************************
+* Author:    Kashif Iqbal Khan
+* Email:     kashiif@gmail.com
+* Copyright: 2013 AppBakerZ (appbakerz.com)
+***************************************************************/
+
 function extend(defaults, override){
     for(var key in override) {
         if(override.hasOwnProperty(key)) {
@@ -49,9 +55,7 @@ module.exports = function(grunt) {
   if (missing.length) {
     grunt.fail.fatal("Not found valid values for: " + missing);
     return;
-  }
-
-  
+  }  
     
   extend(buildParams, userParams);
   for(var key in buildParams) {
@@ -99,7 +103,13 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 	distdir: distdir,
 
-
+  copy: {
+    prod: {
+      files:  [
+        { src: 'src/grunt-includes/header-comments.txt', dest: 'dest/folder1' }
+      ]
+    }
+   },
 	"string-replace": {
 	  prod: {
       options: {
@@ -135,6 +145,32 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-file-regex-rename');
   
+  grunt.registerTask('copy-index-file', 'Copies empty index.php file to every folder', function() {
+    
+    // Force task into async mode and grab a handle to the "done" function.
+    var done = this.async();
+
+    var copyHelper  = require('./copyhelper');
+    
+    copyHelper.walk(distdir, function(error, found) {
+
+      if (error) {
+          grunt.fail.fatal(error);
+          done();
+          return;
+      }
+
+      found.dirs.forEach(function(item){
+        grunt.file.copy('src/grunt-includes/index.php',  path.resolve(path.join(item, 'index.php')));
+      });
+      
+      done();
+
+    });
+
+    
+  });
+
 	// Default task(s).
-	grunt.registerTask('default', ['string-replace',  'fileregexrename']);
+	grunt.registerTask('default', ['string-replace',  'fileregexrename', 'copy-index-file']);
 };

@@ -1,0 +1,32 @@
+{
+  "name": "WordpressPluginGenerator",
+  "title": "Wordpress Plugin Generator",
+  "description": "wordpress plugin generator ",
+  "version": "0.1.0",
+  "homepage": "",
+  "author": {
+    "name": "Kashif Iqbal Khan",
+    "email": "kashiif@gmail.com",
+    "url": "www.kashiif.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "none"
+  },
+  "bugs": {
+    "url": ""
+  },
+  "licenses": [
+    {
+      "type": "none",
+      "url": "/blob/master/LICENSE"
+    }
+  ],
+  "dependencies": {},
+  "keywords": [],
+  "devDependencies": {
+    "grunt-contrib-copy": ">=0.4.0",
+    "grunt-preprocess": "~2.0.0",
+    "grunt-string-replace": "~0.2.3"
+  }
+}

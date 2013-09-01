@@ -1,0 +1,5 @@
+ * @package {plugin-class-name}
+ * @author  {author-name} <{author-email}>
+ * @license   GPL-2.0+
+ * @copyright 2013 {owner-name} {owner-email} {owner-uri}
+ * @link      {plugin-uri}

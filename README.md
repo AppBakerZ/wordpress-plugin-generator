@@ -5,6 +5,8 @@ Create a new wordpress plugin in 3 seconds using GruntJS.
 
 ### First Time Setup
 
+If you dont have NodeJS and grunt already installed on your PC then follow these instructions, otherwise proceed to next section.
+
 1. Install [NodeJS](http://nodejs.org#download).
 
 2. Install GruntJS by typing the following command:

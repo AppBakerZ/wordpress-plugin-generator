@@ -22,11 +22,12 @@
       "url": "/blob/master/LICENSE"
     }
   ],
-  "dependencies": {},
-  "keywords": [],
-  "devDependencies": {
+  "dependencies": {
     "grunt-contrib-copy": ">=0.4.0",
     "grunt-preprocess": "~2.0.0",
-    "grunt-string-replace": "~0.2.3"
-  }
+    "grunt-string-replace": "~0.2.3",
+    "grunt-file-regex-rename": "~0.1.0"
+  },
+  "keywords": [],
+  "devDependencies": {}
 }

@@ -80,6 +80,7 @@ module.exports = function(grunt) {
   }
   buildParams["plugin-class-name-upper"] = buildParams["plugin-class-name"].toUpperCase();
   
+  copyValueIfMissing(buildParams, "plugin-desc", "plugin-name");
   copyValueIfMissing(buildParams, "owner-name", "author-name");
   copyValueIfMissing(buildParams, "owner-email", "author-email");
   copyValueIfMissing(buildParams, "owner-uri", "author-uri");

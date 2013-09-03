@@ -30,9 +30,9 @@ function makeValidIdentifier(name) {
 
 module.exports = function(grunt) {
 
-  var path  = require('path');
+  var path  = require("path");
 
-  var userParams = grunt.file.readJSON('build.json'),
+  var userParams = grunt.file.readJSON("build.json"),
       buildParams = {
         "author-name": "",
         "author-uri": "",
@@ -69,14 +69,14 @@ module.exports = function(grunt) {
     // TODO: validate that plugin-slug should not contain invalid chars
   } else {
     // auto generated plugin-slug should be a valid file-system name
-    buildParams["plugin-slug"] = buildParams["plugin-name"].toLowerCase().replace(re, '-');
+    buildParams["plugin-slug"] = buildParams["plugin-name"].toLowerCase().replace(re, "-");
   }
   
 	if (buildParams["plugin-class-name"]) {
     // TODO: validate that className is valid identifier
   } else {
     // auto generated plugin-class-name should be a valid identifier
-    buildParams["plugin-class-name"] = makeValidIdentifier(buildParams["plugin-name"].replace(re, '_'));
+    buildParams["plugin-class-name"] = makeValidIdentifier(buildParams["plugin-name"].replace(re, "_"));
   }
   buildParams["plugin-class-name-upper"] = buildParams["plugin-class-name"].toUpperCase();
   
@@ -85,8 +85,8 @@ module.exports = function(grunt) {
   copyValueIfMissing(buildParams, "owner-email", "author-email");
   copyValueIfMissing(buildParams, "owner-uri", "author-uri");
 
-	var pkg = grunt.file.readJSON('package.json'),
-      distdir = 'dist/' + buildParams["plugin-slug"] + '/', // The path to package directory
+	var pkg = grunt.file.readJSON("package.json"),
+      distdir = "dist/" + buildParams["plugin-slug"] + "/", // The path to package directory
       replacements = [];
   
   for(key in buildParams) {
@@ -99,26 +99,26 @@ module.exports = function(grunt) {
   }
   
 
-  // TODO: copy index.php to every directory in distdir
 	// Project configuration.
-	grunt.initConfig({
-	distdir: distdir,
+	var cfg = {
 
   copy: {
     prod: {
       files:  [
-        { src: 'src/grunt-includes/header-comments.txt', dest: 'dest/folder1' }
+        { src: "src/grunt-includes/header-comments.txt", dest: "dest/folder1" }
       ]
     }
    },
-	"string-replace": {
+	clean: ["dist/"],
+  
+  "string-replace": {
 	  prod: {
       options: {
         replacements: replacements
       },
 
       files: [
-        {expand: true, cwd: 'src/plugin-template', src : ['**/*.*', '!**/modules/*.jsm'],  dest: distdir }
+        {expand: true, cwd: "src/plugin-template", src : ["**/*.*", "!**/modules/*.jsm"],  dest: distdir }
         ]
     },
 	},
@@ -129,29 +129,30 @@ module.exports = function(grunt) {
       options: {
         replacements: replacements
       },
-      files: [ { expand: true, cwd: distdir, src: '**/*.*', dest: distdir }]
+      files: [ { expand: true, cwd: distdir, src: "**/*.*", dest: distdir }]
 
 	  },
 	  
 	}
   
   
-	});
+	};
 
+
+  grunt.initConfig(cfg);
+
+	grunt.loadNpmTasks("grunt-contrib-clean");
 	//grunt.loadNpmTasks('grunt-contrib-copy');
-
 	//grunt.loadNpmTasks('grunt-preprocess');
-
-  grunt.loadNpmTasks('grunt-string-replace');
-
-  grunt.loadNpmTasks('grunt-file-regex-rename');
+  grunt.loadNpmTasks("grunt-string-replace");
+  grunt.loadNpmTasks("grunt-file-regex-rename");
   
-  grunt.registerTask('copy-index-file', 'Copies empty index.php file to every folder', function() {
+  grunt.registerTask("copy-index-file", "Copies empty index.php file to every folder", function() {
     
     // Force task into async mode and grab a handle to the "done" function.
     var done = this.async();
 
-    var copyHelper  = require('./copyhelper');
+    var copyHelper  = require("./copyhelper");
     
     copyHelper.walk(distdir, function(error, found) {
 
@@ -162,7 +163,7 @@ module.exports = function(grunt) {
       }
 
       found.dirs.forEach(function(item){
-        grunt.file.copy('src/grunt-includes/index.php',  path.resolve(path.join(item, 'index.php')));
+        grunt.file.copy("src/grunt-includes/index.php",  path.resolve(path.join(item, "index.php")));
       });
       
       done();
@@ -173,5 +174,5 @@ module.exports = function(grunt) {
   });
 
 	// Default task(s).
-	grunt.registerTask('default', ['string-replace',  'fileregexrename', 'copy-index-file']);
+	grunt.registerTask("default", ["clean", "string-replace",  "fileregexrename", "copy-index-file"]);
 };

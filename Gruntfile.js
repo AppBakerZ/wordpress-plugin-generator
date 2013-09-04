@@ -8,7 +8,12 @@
 function extend(defaults, override){
     for(var key in override) {
         if(override.hasOwnProperty(key)) {
-            defaults[key] = override[key];
+            if (typeof override[key] == "object") {
+              extend(defaults[key], override[key]);
+            }
+            else {
+              defaults[key] = override[key];
+            }
         }
     }
     return defaults;
@@ -103,7 +108,8 @@ module.exports = function(grunt) {
   
 
 	// Project configuration.
-	var cfg = {
+	var phpSourceFiles = ["**/*.php"];
+  var cfg = {
 
 	clean: ["dist/"],
   
@@ -115,7 +121,7 @@ module.exports = function(grunt) {
 
       files: [
         // Note that .php files are copied as .php.js. This is to hack preprocess to think .php.js file as js files
-        {expand: true, cwd: "src/plugin-template", src : ["**/*.php"],  dest: distdir, ext: ".php.js" },
+        {expand: true, cwd: "src/plugin-template", src : phpSourceFiles,  dest: distdir, ext: ".php.js" },
         {expand: true, cwd: "src/plugin-template", src : ["**/*.*", "!**/*.php"],  dest: distdir }
         ]
     },
@@ -155,12 +161,16 @@ module.exports = function(grunt) {
   
   for(var prop in buildParams.options) {
     var opt = buildParams.options[prop];
-    if (opt !== true && (typeof opt == "Array" && opt.length < 1)) continue;
-    
-    var key = prop.toUpperCase().replace(/-/g, "");
-    preprocessContext[key] = opt;
-
-    grunt.log.writeln(key);
+    if ((typeof opt == "boolean" && opt) || (typeof opt == "Array" && opt.length > 0)) {
+      
+      var key = prop.toUpperCase().replace(/-/g, "");
+      preprocessContext[key] = opt;
+      grunt.log.writeln(key + ": " + opt);
+    }
+  }
+  
+  if (buildParams.options["settings-page"] !== true) {
+    phpSourceFiles.push("!**inc/admin-settings.php");
   }
 
   grunt.initConfig(cfg);
@@ -170,8 +180,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-string-replace");
   grunt.loadNpmTasks("grunt-file-regex-rename");
   
-  grunt.loadTasks("./grunt-modules/tasks/");
-
   grunt.registerTask("perform-final-tasks", "Copies empty index.php file to every folder", function() {
     
     // Force task into async mode and grab a handle to the "done" function.

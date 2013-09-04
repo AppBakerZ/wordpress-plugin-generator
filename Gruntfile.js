@@ -152,7 +152,7 @@ module.exports = function(grunt) {
     // Force task into async mode and grab a handle to the "done" function.
     var done = this.async();
 
-    var copyHelper  = require("./copyhelper");
+    var copyHelper  = require("./grunt-modules/copyhelper");
     
     copyHelper.walk(distdir, function(error, found) {
 

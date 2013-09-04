@@ -114,6 +114,7 @@ module.exports = function(grunt) {
       },
 
       files: [
+        // Note that .php files are copied as .php.js. This is to hack preprocess to think .php.js file as js files
         {expand: true, cwd: "src/plugin-template", src : ["**/*.php"],  dest: distdir, ext: ".php.js" },
         {expand: true, cwd: "src/plugin-template", src : ["**/*.*", "!**/*.php"],  dest: distdir }
         ]
@@ -165,7 +166,6 @@ module.exports = function(grunt) {
   grunt.initConfig(cfg);
 
 	grunt.loadNpmTasks("grunt-contrib-clean");
-	//grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-preprocess');
   grunt.loadNpmTasks("grunt-string-replace");
   grunt.loadNpmTasks("grunt-file-regex-rename");
@@ -193,6 +193,7 @@ module.exports = function(grunt) {
       });
 
       found.files.forEach(function(item){
+        // if the file extension is .php.js, change it to .php
         if(item.substr(item.length-7) == ".php.js") {
           fs.renameSync(item, item.substr(0, item.length-3));
         }

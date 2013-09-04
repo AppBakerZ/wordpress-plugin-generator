@@ -122,7 +122,8 @@ module.exports = function(grunt) {
       files: [
         // Note that .php files are copied as .php.js. This is to hack preprocess to think .php.js file as js files
         {expand: true, cwd: "src/plugin-template", src : phpSourceFiles,  dest: distdir, ext: ".php.js" },
-        {expand: true, cwd: "src/plugin-template", src : ["**/*.*", "!**/*.php"],  dest: distdir }
+        {expand: true, cwd: "src/plugin-template", src : ["**/*.*", "!**/*.php"],  dest: distdir },
+        {expand: true, cwd: "src/grunt-includes", src : ["**/*.*"],  dest: "dist/temp" }
         ]
     },
 	},

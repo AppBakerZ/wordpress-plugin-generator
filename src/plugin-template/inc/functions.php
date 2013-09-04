@@ -2,7 +2,7 @@
 /**
  * Common functions of {plugin-name}
  *
-#INCLUDE header-comments
+// @include ../../temp/header-comments.txt
  */
 
 class {plugin-class-name}_Functions {

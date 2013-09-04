@@ -1,4 +1,9 @@
 <?php
+/**
+ * Admin class for {plugin-name}
+ *
+// @include ../../temp/header-comments.txt
+ */
 
 class {plugin-class-name}_Admin {
 

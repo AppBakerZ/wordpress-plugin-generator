@@ -2,7 +2,7 @@
 /**
  * Plugin class.
  *
-#INCLUDE header-comments
+// @include ../../temp/header-comments.txt
  */
 class {plugin-class-name} {
 

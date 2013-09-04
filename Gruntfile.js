@@ -43,7 +43,10 @@ module.exports = function(grunt) {
         "plugin-name": "",
         "plugin-slug": "",
         "plugin-desc": "",
-        "plugin-uri": ""
+        "plugin-uri": "",
+        "options": {
+          "settings-page": true
+        }
       };
   
   // Valid that user has provided some values for required parameters in build.json
@@ -59,7 +62,7 @@ module.exports = function(grunt) {
     
   extend(buildParams, userParams);
   for(var key in buildParams) {
-      if(buildParams.hasOwnProperty(key)) {
+      if(key != "options" && buildParams.hasOwnProperty(key)) {
         buildParams[key] = buildParams[key].trim();
       }
   }
@@ -102,13 +105,6 @@ module.exports = function(grunt) {
 	// Project configuration.
 	var cfg = {
 
-  copy: {
-    prod: {
-      files:  [
-        { src: "src/grunt-includes/header-comments.txt", dest: "dest/folder1" }
-      ]
-    }
-   },
 	clean: ["dist/"],
   
   "string-replace": {
@@ -118,7 +114,8 @@ module.exports = function(grunt) {
       },
 
       files: [
-        {expand: true, cwd: "src/plugin-template", src : ["**/*.*", "!**/modules/*.jsm"],  dest: distdir }
+        {expand: true, cwd: "src/plugin-template", src : ["**/*.php"],  dest: distdir, ext: ".php.js" },
+        {expand: true, cwd: "src/plugin-template", src : ["**/*.*", "!**/*.php"],  dest: distdir }
         ]
     },
 	},
@@ -133,26 +130,55 @@ module.exports = function(grunt) {
 
 	  },
 	  
-	}
+	},
   
+  preprocess: {
+    options: {
+      // NOTE that if context is defined in the task, it will replace the global context, (not merge it)
+      // This looks like a grunt bug where deep merging is not performed for options
+      context : {
+      }
+    },
+    prod: {
+      options: {
+        inline: true,
+      },
+      src : [ 'dist/**/*.php.js'] 
+    }
+    
+  }
   
 	};
+  
+  var preprocessContext = cfg.preprocess.options.context;
+  
+  for(var prop in buildParams.options) {
+    var opt = buildParams.options[prop];
+    if (opt !== true && (typeof opt == "Array" && opt.length < 1)) continue;
+    
+    var key = prop.toUpperCase().replace(/-/g, "");
+    preprocessContext[key] = opt;
 
+    grunt.log.writeln(key);
+  }
 
   grunt.initConfig(cfg);
 
 	grunt.loadNpmTasks("grunt-contrib-clean");
 	//grunt.loadNpmTasks('grunt-contrib-copy');
-	//grunt.loadNpmTasks('grunt-preprocess');
+	grunt.loadNpmTasks('grunt-preprocess');
   grunt.loadNpmTasks("grunt-string-replace");
   grunt.loadNpmTasks("grunt-file-regex-rename");
   
-  grunt.registerTask("copy-index-file", "Copies empty index.php file to every folder", function() {
+  grunt.loadTasks("./grunt-modules/tasks/");
+
+  grunt.registerTask("perform-final-tasks", "Copies empty index.php file to every folder", function() {
     
     // Force task into async mode and grab a handle to the "done" function.
     var done = this.async();
 
-    var copyHelper  = require("./grunt-modules/copyhelper");
+    var fs = require('fs'),
+        copyHelper  = require("./grunt-modules/copyhelper");
     
     copyHelper.walk(distdir, function(error, found) {
 
@@ -165,6 +191,14 @@ module.exports = function(grunt) {
       found.dirs.forEach(function(item){
         grunt.file.copy("src/grunt-includes/index.php",  path.resolve(path.join(item, "index.php")));
       });
+
+      found.files.forEach(function(item){
+        if(item.substr(item.length-7) == ".php.js") {
+          fs.renameSync(item, item.substr(0, item.length-3));
+        }
+      });
+
+
       
       done();
 
@@ -174,5 +208,5 @@ module.exports = function(grunt) {
   });
 
 	// Default task(s).
-	grunt.registerTask("default", ["clean", "string-replace",  "fileregexrename", "copy-index-file"]);
+	grunt.registerTask("default", ["clean", "string-replace",  "fileregexrename", "preprocess", "perform-final-tasks"]);
 };

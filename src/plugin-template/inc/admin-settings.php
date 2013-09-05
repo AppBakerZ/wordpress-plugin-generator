@@ -84,7 +84,7 @@ class {plugin-class-name}_Admin {
   private function _do_admin_init() {
     $this->settings = get_option( '{plugin-slug}-settings' );
 
-		register_setting( '{plugin-slug}-settings-group', '{plugin-slug}-settings' );
+		register_setting( '{plugin-slug}-settings-group', '{plugin-slug}-settings', array($this, 'validate_plugin_options') );
 	 
 		// Make 2 Sections
     $sections = array(
@@ -135,6 +135,10 @@ class {plugin-class-name}_Admin {
   
   /********************** General Settings Related **********************/
 
+  /**
+  * Displays the descriptive text for general settings section
+  * Could be any html
+  */
 	public function add_general_settings_section() {
 		printf(__('GENERAL_SETTING_AREA_DESCRIPTION', '{plugin-slug}'));
 	}
@@ -149,6 +153,10 @@ class {plugin-class-name}_Admin {
   
   /********************** Required Settings Related **********************/
   
+  /**
+  * Displays the descriptive text for general settings section.
+  * Could be any html
+  */
 	public function add_required_settings_section() { 
 		printf(__('REQUIRED_SETTING_AREA_DESCRIPTION', '{plugin-slug}'));
   }
@@ -161,6 +169,26 @@ class {plugin-class-name}_Admin {
 		$this->add_textbox( 'req-setting-2' );
 	}
 
+  /********************** Validation for Options Form **********************/
+  
+  public function validate_plugin_options($inputs) {
+  
+    $options = get_option('{plugin-slug}-settings');
+
+    /*
+    $val = trim($input['req-setting-1']);
+    if(preg_match('/^[a-z0-9]{32}$/i', $val)) { // put validation logic for req-setting-1 here
+      $options['req-setting-1'] = $val;    
+    }
+    else {
+      $options['req-setting-1'] = '';
+    }
+    */
+    
+    
+    return $options;
+  }
+  
 
 }
 

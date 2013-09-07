@@ -24,7 +24,7 @@ msgstr "Settings"
 
 #: inc/admin-settings.php:74 inc/admin-settings.php:75
 msgid "SETTING_PAGE_MENU_LABEL"
-msgstr "{plugin-name} Options"
+msgstr "{plugin-name}"
 
 #: inc/admin-settings.php:102
 msgid "REQUIRED_SETTING_TITLE"

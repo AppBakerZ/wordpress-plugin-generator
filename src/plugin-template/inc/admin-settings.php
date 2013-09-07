@@ -16,7 +16,15 @@ class {plugin-class-name}_Admin {
 	protected static $instance = null;
   
   
-  private $settings = null;
+	/**
+	 * Slug of the plugin options screen.
+	 *
+	 * @since    0.1.0
+	 * @var      string
+	 */
+	protected $plugin_screen_hook_suffix = null;
+
+  protected $settings = null;
 
 	/**
 	 * Initialize the plugin settings.
@@ -24,6 +32,7 @@ class {plugin-class-name}_Admin {
 	 * @since     1.0.0
 	 */
 	private function __construct() {
+
 	}
 
 	/**
@@ -43,13 +52,57 @@ class {plugin-class-name}_Admin {
 	}
 
 	/**
+	 * Register and enqueue admin-specific style sheet.
+	 *
+	 * @since     0.1.0
+	 * @return    null    Return early if no settings page is registered.
+	 */
+	public function enqueue_admin_styles() {
+
+		if ( ! isset( $this->plugin_screen_hook_suffix ) ) {
+			return;
+		}
+
+		$screen = get_current_screen();
+		if ( $screen->id == $this->plugin_screen_hook_suffix ) {
+			wp_enqueue_style( {plugin-class-name}_Info::slug .'-admin-styles',
+                        {plugin-class-name-upper}_PLUGIN_URL . '/css/admin.css', 
+                        array(),
+                        {plugin-class-name}_Info::version );
+		}
+	}
+
+	/**
+	 * Register and enqueue admin-specific JavaScript.
+	 *
+	 * @since     0.1.0
+	 *
+	 * @return    null    Return early if no settings page is registered.
+	 */
+	public function enqueue_admin_scripts() {
+
+		if ( ! isset( $this->plugin_screen_hook_suffix ) ) {
+			return;
+		}
+
+		$screen = get_current_screen();
+		if ( $screen->id == $this->plugin_screen_hook_suffix ) {
+			wp_enqueue_script( {plugin-class-name}_Info::slug . '-admin-script', 
+                         {plugin-class-name-upper}_PLUGIN_URL . '/js/admin.js',
+                         array( 'jquery' ),
+                        {plugin-class-name}_Info::version );
+		}
+
+	}
+
+	/**
 	* Adds the settings link of plugins page
 	*/
   public static function filter_action_links( $links, $file ) {
     if ( $file != {plugin-class-name-upper}_PLUGIN_BASENAME )
       return $links;
 
-    $settings_link = '<a href="' . menu_page_url( '{plugin-slug}', false ) . '">'
+    $settings_link = '<a href="' . menu_page_url( {plugin-class-name}_Info::settings_page_slug, false ) . '">'
       . esc_html( __( 'Settings', '{plugin-slug}' ) ) . '</a>';
 
     array_push( $links, $settings_link );
@@ -58,20 +111,32 @@ class {plugin-class-name}_Admin {
   }
 
 	/**
-	* Handles admin_menu action
-	*/
+	 * Handles admin_menu action
+   *
+	 * @since    0.1.0
+	 */
 	public function do_admin_menu() {
     self::get_instance()->_do_admin_menu();
   }
     
+	/**
+	 * Register the administration menu for this plugin into the WordPress Dashboard menu.
+	 *
+	 * @since    0.1.0
+	 */
   private function _do_admin_menu() {
-		add_options_page( 
-      __('SETTING_PAGE_MENU_LABEL', '{plugin-slug}'), /* The title of the page when the menu is selected */
-      __('SETTING_PAGE_MENU_LABEL', '{plugin-slug}'), /* The text for the menu */
-      'manage_options', /* capability required for this menu to be displayed to user */
-      '{plugin-slug}', /* menu slug */
-      array($this, 'add_options_page') /* function to be called to output the content for this page */
-    );
+		$this->plugin_screen_hook_suffix = add_options_page( 
+            __('SETTING_PAGE_TITLE', '{plugin-slug}'), /* The title of the page when the menu is selected */
+            __('SETTING_PAGE_MENU_LABEL', '{plugin-slug}'), /* The text for the menu */
+            'manage_options', /* capability required for this menu to be displayed to user */
+            {plugin-class-name}_Info::settings_page_slug , /* menu slug that is used when adding setting sections */
+            array($this, 'add_options_page') /* function to be called to output the content for this page */
+          );
+    
+		// Load admin style sheet and JavaScript.
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_styles' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
+    
 	}
 
 	/**
@@ -86,31 +151,32 @@ class {plugin-class-name}_Admin {
 
 		register_setting( '{plugin-slug}-settings-group', '{plugin-slug}-settings', array($this, 'validate_plugin_options') );
 	 
+    $page = {plugin-class-name}_Info::settings_page_slug;
+
 		// Make 2 Sections
     $sections = array(
                   'required_settings_section', 
                   'general_settings_section'
                 );
     
-		//add_settings_section( 'required_settings_section', __('REQUIRED_SETTING_TITLE', '{plugin-slug}'), array($this, 'add_required_settings_section',) '{plugin-slug}' );
-		//add_settings_section( 'general_settings_section', __('GENERAL_SETTING_TITLE', '{plugin-slug}'), array($this, 'add_general_settings_section'), '{plugin-slug}' );
 		$this->add_section( $sections[0], __('REQUIRED_SETTING_TITLE', '{plugin-slug}'), 'add_required_settings_section' );
 		$this->add_section( $sections[1], __('GENERAL_SETTING_TITLE', '{plugin-slug}'), 'add_general_settings_section' );
 
+
 		// Fields - Required Settings section
-		add_settings_field( 'add_req_setting_1', __('REQUIRED_SETTING_1', '{plugin-slug}'), array($this, 'add_req_setting_1'), '{plugin-slug}', $sections[0] );
-		add_settings_field( 'add_req_setting_2', __('REQUIRED_SETTING_2', '{plugin-slug}'), array($this, 'add_req_setting_2'), '{plugin-slug}', $sections[0] );
+		add_settings_field( 'add_req_setting_1', __('REQUIRED_SETTING_1', '{plugin-slug}'), array($this, 'add_req_setting_1'), $page, $sections[0] );
+		add_settings_field( 'add_req_setting_2', __('REQUIRED_SETTING_2', '{plugin-slug}'), array($this, 'add_req_setting_2'), $page, $sections[0] );
 		
 		// Fields - General Settings section
-		add_settings_field( 'add_gen_setting_1', __('GENERAL_SETTING_1', '{plugin-slug}'), array($this, 'add_gen_setting_1'), '{plugin-slug}', $sections[1] );
-		add_settings_field( 'add_gen_setting_2', __('GENERAL_SETTING_2', '{plugin-slug}'), array($this, 'add_gen_setting_2'), '{plugin-slug}', $sections[1] );
+		add_settings_field( 'add_gen_setting_1', __('GENERAL_SETTING_1', '{plugin-slug}'), array($this, 'add_gen_setting_1'), $page, $sections[1] );
+		add_settings_field( 'add_gen_setting_2', __('GENERAL_SETTING_2', '{plugin-slug}'), array($this, 'add_gen_setting_2'), $page, $sections[1] );
 	}
   
   private function add_section($section, $localized_title, $function_name) {
 		add_settings_section( $section, /* string for use in the 'id' attribute of tags */
                           $localized_title, /* title of the section */
                           array($this, $function_name), /* function that fills the section with the desired content */
-                          '{plugin-slug}' /* The menu slug on which to display this section */
+                          {plugin-class-name}_Info::settings_page_slug /* The menu slug on which to display this section. should be same as passed in add_options_page() */
                         );
   }
 
@@ -126,7 +192,7 @@ class {plugin-class-name}_Admin {
 			<h2><?php printf( __('SETTING_PAGE_TITLE', '{plugin-slug}') ) ?></h2>
 			<form action="options.php" method="POST">
 				<?php settings_fields( '{plugin-slug}-settings-group' ); ?>
-				<?php do_settings_sections( '{plugin-slug}' ); ?>
+				<?php do_settings_sections( {plugin-class-name}_Info::settings_page_slug ); ?>
 				<?php submit_button(); ?>
 			</form>
 		</div>
@@ -171,8 +237,12 @@ class {plugin-class-name}_Admin {
 
   /********************** Validation for Options Form **********************/
   
+  /**
+   * Sanitize user input before it gets saved to database
+   */
   public function validate_plugin_options($inputs) {
-  
+
+    // retrieve old settings
     $options = get_option('{plugin-slug}-settings');
 
     /*
@@ -185,8 +255,8 @@ class {plugin-class-name}_Admin {
     }
     */
     
-    
-    return $options;
+    // return the settings that you want to be saved.
+    return $inputs;
   }
   
 

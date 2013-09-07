@@ -29,8 +29,6 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-define( '{plugin-class-name-upper}_VERSION', '0.1' );
-
 define( '{plugin-class-name-upper}_REQUIRED_WP_VERSION', '3.0' );
 
 if ( ! defined( '{plugin-class-name-upper}_PLUGIN_BASENAME' ) )
@@ -46,6 +44,8 @@ if ( ! defined( '{plugin-class-name-upper}_PLUGIN_URL' ) )
 	define( '{plugin-class-name-upper}_PLUGIN_URL', untrailingslashit( plugins_url( '', __FILE__ ) ) );
 
 
+// include plugin's info class file
+require_once( plugin_dir_path( __FILE__ ) . 'inc/class-{plugin-slug}-info.php' );
 
 // include plugin's class file
 require_once( plugin_dir_path( __FILE__ ) . 'inc/class-{plugin-slug}.php' );

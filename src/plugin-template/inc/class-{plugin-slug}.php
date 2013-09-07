@@ -7,39 +7,12 @@
 class {plugin-class-name} {
 
 	/**
-	 * Plugin version, used for cache-busting of style and script file references.
-	 *
-	 * @since   0.1.0
-	 * @const   string
-	 */
-	const VERSION = '0.1.0';
-
-	/**
-	 * Unique identifier for your plugin.
-	 *
-	 * Use this value (not the variable name) as the text domain when internationalizing strings of text. It should
-	 * match the Text Domain file header in the main plugin file.
-	 *
-	 * @since    0.1.0
-	 * @var      string
-	 */
-	protected $plugin_slug = '{plugin-slug}';
-
-	/**
 	 * Instance of this class.
 	 *
 	 * @since    0.1.0
 	 * @var      object
 	 */
 	protected static $instance = null;
-
-	/**
-	 * Slug of the plugin screen.
-	 *
-	 * @since    0.1.0
-	 * @var      string
-	 */
-	protected $plugin_screen_hook_suffix = null;
 
 	/**
 	 * Initialize the plugin by setting localization, filters, and administration functions.
@@ -50,13 +23,6 @@ class {plugin-class-name} {
 
 		// Load plugin text domain
 		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
-
-		// Add the options page and menu item.
-		// add_action( 'admin_menu', array( $this, 'add_plugin_admin_menu' ) );
-
-		// Load admin style sheet and JavaScript.
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_styles' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
 
 		// Load public-facing style sheet and JavaScript.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
@@ -112,50 +78,11 @@ class {plugin-class-name} {
 	 */
 	public function load_plugin_textdomain() {
 
-		$domain = $this->plugin_slug;
+		$domain = {plugin-class-name}_Info::slug;
 		$locale = apply_filters( 'plugin_locale', get_locale(), $domain );
 
 		load_textdomain( $domain, WP_LANG_DIR . '/' . $domain . '/' . $domain . '-' . $locale . '.mo' );
 		load_plugin_textdomain( $domain, FALSE, {plugin-class-name-upper}_PLUGIN_NAME . '/lang/' );
-	}
-
-	/**
-	 * Register and enqueue admin-specific style sheet.
-	 *
-	 * @since     1.0.0
-	 * @return    null    Return early if no settings page is registered.
-	 */
-	public function enqueue_admin_styles() {
-
-		if ( ! isset( $this->plugin_screen_hook_suffix ) ) {
-			return;
-		}
-
-		$screen = get_current_screen();
-		if ( $screen->id == $this->plugin_screen_hook_suffix ) {
-			wp_enqueue_style( $this->plugin_slug .'-admin-styles', plugins_url( 'css/admin.css', __FILE__ ), array(), $this->version );
-		}
-
-	}
-
-	/**
-	 * Register and enqueue admin-specific JavaScript.
-	 *
-	 * @since     1.0.0
-	 *
-	 * @return    null    Return early if no settings page is registered.
-	 */
-	public function enqueue_admin_scripts() {
-
-		if ( ! isset( $this->plugin_screen_hook_suffix ) ) {
-			return;
-		}
-
-		$screen = get_current_screen();
-		if ( $screen->id == $this->plugin_screen_hook_suffix ) {
-			wp_enqueue_script( $this->plugin_slug . '-admin-script', plugins_url( 'js/admin.js', __FILE__ ), array( 'jquery' ), $this->version );
-		}
-
 	}
 
 	/**
@@ -164,7 +91,7 @@ class {plugin-class-name} {
 	 * @since    0.1.0
 	 */
 	public function enqueue_styles() {
-		wp_enqueue_style( $this->plugin_slug . '-plugin-styles', plugins_url( 'css/public.css', __FILE__ ), array(), $this->version );
+		wp_enqueue_style( {plugin-class-name}_Info::slug . '-plugin-styles', plugins_url( 'css/public.css', __FILE__ ), array(), $this->version );
 	}
 
 	/**
@@ -173,41 +100,8 @@ class {plugin-class-name} {
 	 * @since    0.1.0
 	 */
 	public function enqueue_scripts() {
-		wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'js/public.js', __FILE__ ), array( 'jquery' ), $this->version );
+		wp_enqueue_script( {plugin-class-name}_Info::slug . '-plugin-script', plugins_url( 'js/public.js', __FILE__ ), array( 'jquery' ), $this->version );
 	}
-
-	/**
-	 * Register the administration menu for this plugin into the WordPress Dashboard menu.
-	 *
-	 * @since    0.1.0
-	 */
-	public function add_plugin_admin_menu() {
-
-		/*
-		 * TODO:
-		 *
-		 * Change 'Page Title' to the title of your plugin admin page
-		 * Change 'Menu Text' to the text for menu item for the plugin settings page
-		 */
-		$this->plugin_screen_hook_suffix = add_plugins_page(
-			__( 'Page Title', $this->plugin_slug ),
-			__( 'Menu Text', $this->plugin_slug ),
-			'read',
-			$this->plugin_slug,
-			array( $this, 'display_plugin_admin_page' )
-		);
-
-	}
-
-	/**
-	 * Render the settings page for this plugin.
-	 *
-	 * @since    0.1.0
-	 */
-	public function display_plugin_admin_page() {
-		include_once( 'views/admin.php' );
-	}
-
 
 	/**
 	 * NOTE:  Actions are points in the execution of a page or process

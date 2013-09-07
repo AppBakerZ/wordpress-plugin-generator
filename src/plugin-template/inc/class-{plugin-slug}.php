@@ -58,7 +58,17 @@ class {plugin-class-name} {
 	 * @param    boolean    $network_wide    True if WPMU superadmin uses "Network Activate" action, false if WPMU is disabled or plugin is activated on an individual blog.
 	 */
 	public static function activate( $network_wide ) {
-		// TODO: Define activation functionality here
+    $version_key = '{plugin-slug}-version';
+    $new_version = {plugin-class-name}_Info::version;
+    $old_version = get_option($version_key, "");
+    
+    if ($old_version != $new_version) {
+      // Execute your upgrade logic here
+
+      // Then update the version value
+      update_option($old_version, $new_version);
+    }
+    
 	}
 
 	/**

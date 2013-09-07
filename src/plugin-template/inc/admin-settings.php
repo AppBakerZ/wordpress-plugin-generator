@@ -262,7 +262,7 @@ class {plugin-class-name}_Admin {
 
 }
 
-add_action( 'admin_init', '{plugin-class-name}_Admin::do_admin_init' );
-add_action( 'admin_menu', '{plugin-class-name}_Admin::do_admin_menu' );
+add_action( 'admin_init', array('{plugin-class-name}_Admin','do_admin_init') );
+add_action( 'admin_menu', array('{plugin-class-name}_Admin','do_admin_menu') );
 
-add_filter( 'plugin_action_links', '{plugin-class-name}_Admin::filter_action_links', 10, 2 );
+add_filter( 'plugin_action_links', array('{plugin-class-name}_Admin','filter_action_links'), 10, 2 );

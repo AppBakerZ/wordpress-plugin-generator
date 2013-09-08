@@ -130,6 +130,7 @@ module.exports = function(grunt) {
 
 	// Project configuration.
 	var phpSourceFiles = ["**/*.php"];
+  var taskList = ["clean", "string-replace:prod",  "fileregexrename:prod"];
   var cfg = {
 
 	clean: ["dist/"],
@@ -187,7 +188,6 @@ module.exports = function(grunt) {
       
       var key = prop.toUpperCase().replace(/-/g, "");
       preprocessContext[key] = opt;
-      grunt.log.writeln(key + ": " + opt);
     }
   }
   
@@ -200,11 +200,10 @@ module.exports = function(grunt) {
 
   var widgets = buildParams.options.widgets;
   
-  grunt.log.writeln("widgets found: " + widgets.length);
   if (widgets.length > 0) {
 
-    var stringReplaceTask = cfg["string-replace"];
-    var fileRenameTask = cfg["fileregexrename"];
+    var stringReplaceTask = cfg["string-replace"],
+        fileRenameTask = cfg["fileregexrename"];
 
     /*
     var buildParamsClone = {};    
@@ -214,7 +213,7 @@ module.exports = function(grunt) {
 
     widgets.forEach(function(widget, arg2, arg3) {
     
-      grunt.log.writeln("widgets.forEach: " + widget + ", " + arg2 + ", " + arg3);
+      grunt.log.debug("widgets.forEach: " + widget + ", " + arg2 + ", " + arg3);
 
       // TODO: make sure both widget-id and widget-class-name are present
       
@@ -225,7 +224,7 @@ module.exports = function(grunt) {
       widgetReplacements.push(makeReplacementObject("plugin-widget-class-name", widget["class-name"]));
       widgetReplacements.push(makeReplacementObject("plugin-widget-id", widget.id));
 
-      grunt.log.writeln("replacements: " + JSON.stringify(widgetReplacements));
+      grunt.log.debug("replacements: " + JSON.stringify(widgetReplacements));
       
       
       // add a new task for string replacement
@@ -238,6 +237,17 @@ module.exports = function(grunt) {
           {expand: true, cwd: "src/plugin-template", src : ["**/*{plugin-widget*.*", "!**/*.php"],  dest: distdir }
         ]
       };
+      
+      fileRenameTask[widget.id] = {
+        options: {
+          replacements: widgetReplacements
+        },
+        files: [ { expand: true, cwd: distdir, src: "**/*{plugin-widget*.*", dest: distdir }]
+      }
+      
+      taskList.push("string-replace:" + widget.id);
+      taskList.push("fileregexrename:" + widget.id);
+
       
     });
     
@@ -287,5 +297,8 @@ module.exports = function(grunt) {
   });
 
 	// Default task(s).
-	grunt.registerTask("default", ["clean", "string-replace",  "fileregexrename", "preprocess", "perform-final-tasks"]);
+  taskList.push("preprocess");
+  taskList.push("perform-final-tasks");
+  
+	grunt.registerTask("default", taskList);
 };

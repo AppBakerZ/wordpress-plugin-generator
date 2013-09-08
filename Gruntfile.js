@@ -8,11 +8,24 @@
 function extend(defaults, override){
     for(var key in override) {
         if(override.hasOwnProperty(key)) {
-            if (typeof override[key] == "object") {
-              extend(defaults[key], override[key]);
+            var val = override[key];
+            if (val instanceof Array) {
+              var arr = new Array(val.length);
+              for (var i=0 ; i<val.length; i++) {
+                arr[i] = val[i];
+              }
+              defaults[key] = arr;
+            }
+            else if (typeof val == "object") {
+              var target = defaults[key];
+              if (!target) {
+                target = {};
+                defaults[key] = target;
+              }
+              extend(target, val);
             }
             else {
-              defaults[key] = override[key];
+              defaults[key] = val;
             }
         }
     }
@@ -33,6 +46,13 @@ function makeValidIdentifier(name) {
   return name.trim().replace(/\W+/g, "");
 }
 
+function makeReplacementObject(key, value) {
+  return {
+      pattern: new RegExp("\{" + key + "\}", "g"),
+      replacement: value
+    }
+}
+ 
 module.exports = function(grunt) {
 
   var path  = require("path");
@@ -103,10 +123,7 @@ module.exports = function(grunt) {
   
   for(key in buildParams) {
       if(buildParams.hasOwnProperty(key)) {
-          replacements.push({
-              pattern: new RegExp("\{" + key + "\}", "g"),
-              replacement: buildParams[key]
-            });
+          replacements.push(makeReplacementObject(key, buildParams[key]));
       }
   }
   
@@ -183,39 +200,46 @@ module.exports = function(grunt) {
 
   var widgets = buildParams.options.widgets;
   
+  grunt.log.writeln("widgets found: " + widgets.length);
   if (widgets.length > 0) {
+
     var stringReplaceTask = cfg["string-replace"];
     var fileRenameTask = cfg["fileregexrename"];
 
-    var buildParamsClone = extend({}, buildParams);
-
+    /*
+    var buildParamsClone = {};    
+    extend(buildParamsClone, buildParams);
     delete buildParamsClone["widgets"];
+    */
+
+    widgets.forEach(function(widget, arg2, arg3) {
     
-    widgets.forEach(function(widget) {
+      grunt.log.writeln("widgets.forEach: " + widget + ", " + arg2 + ", " + arg3);
+
       // TODO: make sure both widget-id and widget-class-name are present
       
-      var widgetParams = {
-          "{plugin-widget-class-name}": widget["class-name"],
-          "{plugin-widget-id}": widget.id
-        };
-    
-    
-      var replacements = extend({}, buildParamsClone);
-      replacements = extend(replacements, widgetParams);
+      // we need new replacement object for every widget
+      var widgetReplacements = replacements.map(function(item) { return item; } );
+
+      
+      widgetReplacements.push(makeReplacementObject("plugin-widget-class-name", widget["class-name"]));
+      widgetReplacements.push(makeReplacementObject("plugin-widget-id", widget.id));
+
+      grunt.log.writeln("replacements: " + JSON.stringify(widgetReplacements));
+      
       
       // add a new task for string replacement
       stringReplaceTask[widget.id] = {
         options: {
-          replacements: replacements
+          replacements: widgetReplacements
         },
         files: [
           {expand: true, cwd: "src/plugin-template", src : ["**/*{plugin-widget*.php"],  dest: distdir, ext: ".php.js" },
           {expand: true, cwd: "src/plugin-template", src : ["**/*{plugin-widget*.*", "!**/*.php"],  dest: distdir }
         ]
-      }
+      };
       
     });
-    
     
   }
     

@@ -5,11 +5,7 @@
  * A foundation off of which to build well-documented WordPress plugins that also follow
  * WordPress coding standards and PHP best practices.
  *
- * @package   {plugin-class-name}
- * @author    {author-name} <{author-email}>
- * @license   GPL-2.0+
- * @link      {plugin-uri}
- * @copyright 2013 {owner-name} {owner-email} {owner-uri}
+// @include ../temp/header-comments.txt
  *
  * @wordpress-plugin
  * Plugin Name: {plugin-name}

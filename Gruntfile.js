@@ -50,8 +50,9 @@ module.exports = function(grunt) {
         "plugin-desc": "",
         "plugin-uri": "",
         "options": {
-          "settings-page": true
-        }
+          "settings-page": true,
+          "widgets": []
+        },
       };
   
   // Valid that user has provided some values for required parameters in build.json
@@ -67,8 +68,11 @@ module.exports = function(grunt) {
     
   extend(buildParams, userParams);
   for(var key in buildParams) {
-      if(key != "options" && buildParams.hasOwnProperty(key)) {
-        buildParams[key] = buildParams[key].trim();
+      if(buildParams.hasOwnProperty(key)) {
+        var val = buildParams[key]
+        if (typeof val == "string") {
+          buildParams[key] = buildParams[key].trim();
+        }
       }
   }
   
@@ -122,7 +126,7 @@ module.exports = function(grunt) {
       files: [
         // Note that .php files are copied as .php.js. This is to hack preprocess to think .php.js file as js files
         {expand: true, cwd: "src/plugin-template", src : phpSourceFiles,  dest: distdir, ext: ".php.js" },
-        {expand: true, cwd: "src/plugin-template", src : ["**/*.*", "!**/*.php"],  dest: distdir },
+        {expand: true, cwd: "src/plugin-template", src : ["**/*.*", "!**/*.php", "!**/*plugin-widget*.*"],  dest: distdir },
         {expand: true, cwd: "src/grunt-includes", src : ["**/*.*"],  dest: "dist/temp" }
         ]
     },
@@ -173,7 +177,48 @@ module.exports = function(grunt) {
   if (buildParams.options["settings-page"] !== true) {
     phpSourceFiles.push("!**inc/admin-settings.php");
   }
+  
+  // don't copy widget related files, these will be included in a separate files object
+  phpSourceFiles.push( "!**/*{plugin-widget*.*" );
 
+  var widgets = buildParams.options.widgets;
+  
+  if (widgets.length > 0) {
+    var stringReplaceTask = cfg["string-replace"];
+    var fileRenameTask = cfg["fileregexrename"];
+
+    var buildParamsClone = extend({}, buildParams);
+
+    delete buildParamsClone["widgets"];
+    
+    widgets.forEach(function(widget) {
+      // TODO: make sure both widget-id and widget-class-name are present
+      
+      var widgetParams = {
+          "{plugin-widget-class-name}": widget["class-name"],
+          "{plugin-widget-id}": widget.id
+        };
+    
+    
+      var replacements = extend({}, buildParamsClone);
+      replacements = extend(replacements, widgetParams);
+      
+      // add a new task for string replacement
+      stringReplaceTask[widget.id] = {
+        options: {
+          replacements: replacements
+        },
+        files: [
+          {expand: true, cwd: "src/plugin-template", src : ["**/*{plugin-widget*.php"],  dest: distdir, ext: ".php.js" },
+          {expand: true, cwd: "src/plugin-template", src : ["**/*{plugin-widget*.*", "!**/*.php"],  dest: distdir }
+        ]
+      }
+      
+    });
+    
+    
+  }
+    
   grunt.initConfig(cfg);
 
 	grunt.loadNpmTasks("grunt-contrib-clean");

@@ -9,5 +9,16 @@
   "owner-email": "",
   "plugin-slug": "",
   "plugin-desc": "",
-  "plugin-uri": ""
+  "plugin-uri": "",
+
+  "options": {
+    "settings-page": true,
+    "widgets": [
+      {
+        "id": "my-plugin-widget",
+        "class-name": "My_Plugin_Widget"
+      }
+    ]
+  },
+
 }

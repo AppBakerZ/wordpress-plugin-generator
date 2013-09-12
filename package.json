@@ -1,7 +1,7 @@
 {
   "name": "WordpressPluginGenerator",
-  "title": "Wordpress Plugin Generator",
-  "description": "wordpress plugin generator ",
+  "title": "AppBakerZ Wordpress Plugin Generator",
+  "description": "Wordpress plugin generator by AppBakerz",
   "version": "0.1.0",
   "homepage": "",
   "author": {
@@ -23,6 +23,7 @@
     }
   ],
   "dependencies": {
+    "grunt": "~0.4.1",
     "grunt-preprocess": "~2.0.0",
     "grunt-string-replace": "~0.2.3",
     "grunt-file-regex-rename": "~0.1.0",

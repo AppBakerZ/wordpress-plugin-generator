@@ -1,6 +1,6 @@
 <?php
 /**
- * {plugin-name} widget class.
+ * {plugin-widget-name} class.
  *
  * Encapsulates all functionality for widget
  *
@@ -22,11 +22,11 @@ class {plugin-widget-class-name} extends WP_Widget {
 
     // TODO:  update classname and description
     parent::__construct(
-      "{plugin-widget-id}",
-      __( "Widget Name", "{plugin-name}" ),
+      "{plugin-widget-id}", /* Widget id */
+      __( "{plugin-widget-name}", "{plugin-slug}" ), /* Widget Name that appears as title of widget in admin area */
       array(
-        "classname"    =>  "widget-name-class",
-        "description"  =>  __( "Short description of the widget goes here.", "{plugin-name}" )
+        "classname"    =>  "{plugin-widget-class-name}",
+        "description"  =>  __( "Short description of the widget goes here.", "{plugin-slug}" )
       )
     );
 
@@ -91,7 +91,7 @@ class {plugin-widget-class-name} extends WP_Widget {
     // TODO:  Store the values of the widget in their own variable
 
     // Display the admin form
-    include( plugin_dir_path(__FILE__) . "/views/{plugin-widget-id}-admin.php" );
+    include( {plugin-class-name-upper}_PLUGIN_DIR . "/views/{plugin-widget-id}-admin.php" );
 
   } // end form
 

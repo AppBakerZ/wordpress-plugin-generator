@@ -205,15 +205,11 @@ module.exports = function(grunt) {
     var stringReplaceTask = cfg["string-replace"],
         fileRenameTask = cfg["fileregexrename"];
 
-    /*
-    var buildParamsClone = {};    
-    extend(buildParamsClone, buildParams);
-    delete buildParamsClone["widgets"];
-    */
-
     widgets.forEach(function(widget, arg2, arg3) {
     
       grunt.log.debug("widgets.forEach: " + widget + ", " + arg2 + ", " + arg3);
+
+      // TODO: make sure widget-id and widget class name are unique
 
       // TODO: make sure both widget-id and widget-class-name are present
       
@@ -221,6 +217,7 @@ module.exports = function(grunt) {
       var widgetReplacements = replacements.map(function(item) { return item; } );
 
       
+      widgetReplacements.push(makeReplacementObject("plugin-widget-name", buildParams["plugin-name"] + " Widget"));
       widgetReplacements.push(makeReplacementObject("plugin-widget-class-name", widget["class-name"]));
       widgetReplacements.push(makeReplacementObject("plugin-widget-id", widget.id));
 

@@ -118,7 +118,8 @@ module.exports = function(grunt) {
   copyValueIfMissing(buildParams, "owner-uri", "author-uri");
 
 	var pkg = grunt.file.readJSON("package.json"),
-      distdir = "dist/" + buildParams["plugin-slug"] + "/", // The path to package directory
+      distdirRoot = "dist/",
+      distdir = distdirRoot + buildParams["plugin-slug"] + "/", // The path to package directory
       replacements = [];
   
   for(key in buildParams) {
@@ -145,7 +146,7 @@ module.exports = function(grunt) {
         // Note that .php files are copied as .php.js. This is to hack preprocess to think .php.js file as js files
         {expand: true, cwd: "src/plugin-template", src : phpSourceFiles,  dest: distdir, ext: ".php.js" },
         {expand: true, cwd: "src/plugin-template", src : ["**/*.*", "!**/*.php", "!**/*plugin-widget*.*"],  dest: distdir },
-        {expand: true, cwd: "src/grunt-includes", src : ["**/*.*"],  dest: "dist/temp" }
+        {expand: true, cwd: "src/grunt-includes", src : ["**/*.*"],  dest: distdirRoot + "temp" }
         ]
     },
 	},
@@ -198,12 +199,16 @@ module.exports = function(grunt) {
   // don't copy widget related files, these will be included in a separate files object
   phpSourceFiles.push( "!**/*{plugin-widget*.*" );
 
-  var widgets = buildParams.options.widgets;
+  var widgets = buildParams.options.widgets,
+      widgetFiles = [];
   
   if (widgets.length > 0) {
 
     var stringReplaceTask = cfg["string-replace"],
-        fileRenameTask = cfg["fileregexrename"];
+        fileRenameTask = cfg["fileregexrename"]
+
+    // Set preprocessor context variable so it is available for grunt-preprocess @ifdef
+    preprocessContext["WIDGETS"] = true;
 
     widgets.forEach(function(widget, arg2, arg3) {
     
@@ -233,7 +238,7 @@ module.exports = function(grunt) {
           {expand: true, cwd: "src/plugin-template", src : ["**/*{plugin-widget*.php"],  dest: distdir, ext: ".php.js" },
           {expand: true, cwd: "src/plugin-template", src : ["**/*{plugin-widget*.*", "!**/*.php"],  dest: distdir }
         ]
-      };
+      }; 
       
       fileRenameTask[widget.id] = {
         options: {
@@ -244,9 +249,9 @@ module.exports = function(grunt) {
       
       taskList.push("string-replace:" + widget.id);
       taskList.push("fileregexrename:" + widget.id);
-
+      widgetFiles.push("class-" + widget.id + ".php");
       
-    });
+    }); // end widgets.forEach
     
   }
     
@@ -257,6 +262,25 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-string-replace");
   grunt.loadNpmTasks("grunt-file-regex-rename");
   
+  if (widgetFiles.length) {
+    grunt.registerTask("generate-widget-include-file", "Generates temp/widgets.php to be included in plugin file", function() {
+      var fs = require("fs");
+
+      var l = "require_once( plugin_dir_path( __FILE__ ) . 'inc/admin-settings.php' );"
+
+      
+      var contents = widgetFiles.map(function(item){
+          return "require_once( plugin_dir_path( __FILE__ ) . 'inc/" + item + "' );"
+        });
+      
+      fs.writeFileSync(distdirRoot + "temp/widgets.php", contents.join("\r\n"));
+    
+    });
+    
+    // add the task to default task list
+    taskList.push("generate-widget-include-file");
+  }
+
   grunt.registerTask("perform-final-tasks", "Copies empty index.php file to every folder", function() {
     
     // Force task into async mode and grab a handle to the "done" function.
@@ -294,7 +318,7 @@ module.exports = function(grunt) {
   });
 
 	// Default task(s).
-  taskList.push("preprocess");
+  taskList.push("preprocess");  
   taskList.push("perform-final-tasks");
   
 	grunt.registerTask("default", taskList);

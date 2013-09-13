@@ -50,6 +50,11 @@ require_once( plugin_dir_path( __FILE__ ) . 'inc/class-{plugin-slug}.php' );
 require_once( plugin_dir_path( __FILE__ ) . 'inc/admin-settings.php' );
 // @endif
 
+// @ifdef WIDGETS
+// @include ../temp/widgets.php
+// @endif
+
+
 // Register hooks that are fired when the plugin is activated, deactivated, and uninstalled, respectively.
 register_activation_hook( __FILE__, array( '{plugin-class-name}', 'activate' ) );
 register_deactivation_hook( __FILE__, array( '{plugin-class-name}', 'deactivate' ) );

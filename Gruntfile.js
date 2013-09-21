@@ -262,24 +262,27 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-string-replace");
   grunt.loadNpmTasks("grunt-file-regex-rename");
   
-  if (widgetFiles.length) {
-    grunt.registerTask("generate-widget-include-file", "Generates temp/widgets.php to be included in plugin file", function() {
-      var fs = require("fs");
+  grunt.registerTask("generate-widget-include-file", "Generates temp/widgets.php to be included in plugin file", function() {
+    var fs = require("fs");
 
+    var contents = [];
+
+    if (widgetFiles.length) {
       var l = "require_once( plugin_dir_path( __FILE__ ) . 'inc/admin-settings.php' );"
 
       
       var contents = widgetFiles.map(function(item){
           return "require_once( plugin_dir_path( __FILE__ ) . 'inc/" + item + "' );"
-        });
-      
-      fs.writeFileSync(distdirRoot + "temp/widgets.php", contents.join("\r\n"));
+        });    
+    }
     
-    });
+    fs.writeFileSync(distdirRoot + "temp/widgets.php", contents.join("\r\n"));
     
-    // add the task to default task list
-    taskList.push("generate-widget-include-file");
-  }
+  });
+  // The preprocess plugin requires that every include file must be present even if the include is
+  // dynamic and inside a falsy @ifdef block. 
+  // We need to add the task to default task list so that widgets.php is always generated.
+  taskList.push("generate-widget-include-file");
 
   grunt.registerTask("perform-final-tasks", "Copies empty index.php file to every folder", function() {
     

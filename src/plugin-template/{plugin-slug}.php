@@ -25,29 +25,60 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-define( '{plugin-class-name-upper}_REQUIRED_WP_VERSION', '3.0' );
+/**
+ * {plugin-name} MetaData class.
+ *
+ * Defines useful constants
+ */
 
-if ( ! defined( '{plugin-class-name-upper}_PLUGIN_BASENAME' ) )
-	define( '{plugin-class-name-upper}_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
+class {plugin-class-name}_Info {
+	/**
+	 * Unique identifier for your plugin.
+	 *
+	 * Use this value (not the variable name) as the text domain when internationalizing strings of text. It should
+	 * match the Text Domain file header in the main plugin file.
+	 *
+	 * @since    0.1.0
+	 * @var      string
+	 */
+  	const slug = '{plugin-slug}';
+  	const base_name = '{plugin-slug}';
 
-if ( ! defined( '{plugin-class-name-upper}_PLUGIN_NAME' ) )
-	define( '{plugin-class-name-upper}_PLUGIN_NAME', trim( dirname( {plugin-class-name-upper}_PLUGIN_BASENAME ), '/' ) );
+    // @ifdef SETTINGSPAGE
+  	const settings_page_slug = '{plugin-slug}-options';
+    // @endif
 
-if ( ! defined( '{plugin-class-name-upper}_PLUGIN_DIR' ) )
-	define( '{plugin-class-name-upper}_PLUGIN_DIR', untrailingslashit( dirname( __FILE__ ) ) );
+	/**
+	 * Version of the plugin.
+	 *
+	 * @since    0.1.0
+	 * @var      string
+	 */
+  	const version = '0.1.0';
 
-if ( ! defined( '{plugin-class-name-upper}_PLUGIN_URL' ) )
-	define( '{plugin-class-name-upper}_PLUGIN_URL', untrailingslashit( plugins_url( '', __FILE__ ) ) );
+  	const required_wp_version = '3.0';
+    
+    public static $plugin_dir = '';
+    
+    public static $plugin_url = '';
 
+    public static $plugin_basename = '';
 
-// include plugin's info class file
-require_once( plugin_dir_path( __FILE__ ) . 'inc/class-{plugin-slug}-info.php' );
+  	public static function init_static() {
+      self::$plugin_dir = untrailingslashit( dirname( __FILE__ ) );
+      self::$plugin_url = untrailingslashit( plugins_url( '', __FILE__ ) );
+      self::$plugin_basename = plugin_basename( __FILE__ );
+    }    
+
+}
+
+{plugin-class-name}_Info::init_static();
 
 // include plugin's class file
-require_once( plugin_dir_path( __FILE__ ) . 'inc/class-{plugin-slug}.php' );
+require( plugin_dir_path( __FILE__ ) . 'inc/class-{plugin-slug}.php' );
 
 // @ifdef SETTINGSPAGE
-require_once( plugin_dir_path( __FILE__ ) . 'inc/admin-settings.php' );
+require( plugin_dir_path( __FILE__ ) . 'inc/admin-settings.php' );
 // @endif
 
 // @ifdef WIDGETS

@@ -134,7 +134,7 @@ module.exports = function(grunt) {
   var taskList = ["clean", "string-replace:prod",  "fileregexrename:prod"];
   var cfg = {
 
-	clean: ["dist/"],
+	clean: ["dist/", distdirRoot + "temp/"],
   
   "string-replace": {
 	  prod: {
@@ -268,11 +268,11 @@ module.exports = function(grunt) {
     var contents = [];
 
     if (widgetFiles.length) {
-      var l = "require_once( plugin_dir_path( __FILE__ ) . 'inc/admin-settings.php' );"
+      var l = "require( plugin_dir_path( __FILE__ ) . 'inc/admin-settings.php' );"
 
       
       var contents = widgetFiles.map(function(item){
-          return "require_once( plugin_dir_path( __FILE__ ) . 'inc/" + item + "' );"
+          return "require( plugin_dir_path( __FILE__ ) . 'inc/" + item + "' );"
         });    
     }
     

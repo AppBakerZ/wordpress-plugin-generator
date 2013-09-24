@@ -66,7 +66,7 @@ class {plugin-class-name}_Admin {
     $screen = get_current_screen();
     if ( $screen->id == $this->plugin_screen_hook_suffix ) {
       wp_enqueue_style( {plugin-class-name}_Info::slug .'-admin-styles',
-                        {plugin-class-name-upper}_PLUGIN_URL . '/css/admin.css', 
+                        {plugin-class-name}_Info::$plugin_url . '/css/admin.css', 
                         array(),
                         {plugin-class-name}_Info::version );
     }
@@ -88,7 +88,7 @@ class {plugin-class-name}_Admin {
     $screen = get_current_screen();
     if ( $screen->id == $this->plugin_screen_hook_suffix ) {
       wp_enqueue_script( {plugin-class-name}_Info::slug . '-admin-script', 
-                         {plugin-class-name-upper}_PLUGIN_URL . '/js/admin.js',
+                         {plugin-class-name}_Info::$plugin_url . '/js/admin.js',
                          array( 'jquery' ),
                         {plugin-class-name}_Info::version );
     }
@@ -98,7 +98,7 @@ class {plugin-class-name}_Admin {
   * Adds the settings link of plugins page
   */
   public static function filter_action_links( $links, $file ) {
-    if ( $file != {plugin-class-name-upper}_PLUGIN_BASENAME )
+    if ( $file != {plugin-class-name}_Info::$plugin_basename )
       return $links;
 
     $settings_link = '<a href="' . menu_page_url( {plugin-class-name}_Info::settings_page_slug, false ) . '">'

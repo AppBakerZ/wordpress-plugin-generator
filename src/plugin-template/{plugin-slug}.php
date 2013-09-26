@@ -42,7 +42,6 @@ class {plugin-class-name}_Info {
 	 * @var      string
 	 */
   	const slug = '{plugin-slug}';
-  	const base_name = '{plugin-slug}';
 
     // @ifdef SETTINGSPAGE
   	const settings_page_slug = '{plugin-slug}-options';

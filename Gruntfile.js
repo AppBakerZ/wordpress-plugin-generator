@@ -32,9 +32,9 @@ function extend(defaults, override){
     return defaults;
 }
 
-function copyValueIfMissing(obj, key1, key2){ 
+function copyValueIfMissing(obj, key1, key2, extra){ 
   if (!obj.hasOwnProperty(key1) || obj[key1].length == 0) {
-    obj[key1] = obj[key2];
+    obj[key1] = obj[key2] + (extra? " " + extra: "");
   }
 }
 
@@ -44,6 +44,24 @@ function isValidIdentifier(name) {
 
 function makeValidIdentifier(name) {
   return name.trim().replace(/\W+/g, "");
+}
+
+/**
+* Converts the given String into a valid Class name
+*/
+function makeValidClassName(theString) {
+  var name = theString.replace(/[^a-z|A-Z|\-|_|\s|0-9]/g, "");
+  name = name.split(/[-|_|\s]/g);
+  for (var w=0 ; w<name.length; w++) {
+    var word = name[w];
+    if (word.length > 1) {
+      name[w] = (word[0].toUpperCase()) + word.substr(1);
+    }
+    else {
+      name[w] = word.toUpperCase();
+    }
+  }
+  return name.join("");
 }
 
 function makeReplacementObject(key, value) {
@@ -75,7 +93,7 @@ module.exports = function(grunt) {
         },
       };
   
-  // Valid that user has provided some values for required parameters in build.json
+  // Valid that user has provided values for required parameters in build.json
   var missing = ["plugin-name", "author-name", "author-email"].filter(function(item) {
       var v = userParams[item]; 
       return (!v || v.trim().length == 0);
@@ -85,7 +103,8 @@ module.exports = function(grunt) {
     grunt.fail.fatal("Not found valid values for: " + missing);
     return;
   }  
-    
+
+  // Use default values for parameters not in build.json
   extend(buildParams, userParams);
   for(var key in buildParams) {
       if(buildParams.hasOwnProperty(key)) {
@@ -112,13 +131,12 @@ module.exports = function(grunt) {
   }
   buildParams["plugin-class-name-upper"] = buildParams["plugin-class-name"].toUpperCase();
   
-  copyValueIfMissing(buildParams, "plugin-desc", "plugin-name");
+  copyValueIfMissing(buildParams, "plugin-desc", "plugin-name", "Short Description");
   copyValueIfMissing(buildParams, "owner-name", "author-name");
   copyValueIfMissing(buildParams, "owner-email", "author-email");
   copyValueIfMissing(buildParams, "owner-uri", "author-uri");
 
-	var pkg = grunt.file.readJSON("package.json"),
-      distdirRoot = "dist/",
+	var distdirRoot = "dist/",
       distdir = distdirRoot + buildParams["plugin-slug"] + "/", // The path to package directory
       replacements = [];
   
@@ -126,12 +144,12 @@ module.exports = function(grunt) {
       if(buildParams.hasOwnProperty(key)) {
           replacements.push(makeReplacementObject(key, buildParams[key]));
       }
-  }
-  
+  } 
 
-	// Project configuration.
 	var phpSourceFiles = ["**/*.php"];
+  // Grunt default task list
   var taskList = ["clean", "string-replace:prod",  "fileregexrename:prod"];
+	// Grunt project configuration.
   var cfg = {
 
 	clean: ["dist/", distdirRoot + "temp/"],
@@ -214,22 +232,43 @@ module.exports = function(grunt) {
     
       grunt.log.debug("widgets.forEach: " + widget + ", " + arg2 + ", " + arg3);
 
-      // TODO: make sure widget-id and widget class name are unique
+      // Valid that one of widget-id and widget-class-name are present
+      if (!widget.id) {
+        grunt.log.fail("You should provide id for every widget.");
+        return;
+      }
+      
+      var widgetId = widget.id;
+      // if widget id does not ends with "widget", make it so
+      if (widgetId.length < 6) {
+        widgetId += "widget";
+      }
+      else {
+        if (widgetId.substr(widgetId.length-6).toLowerCase() != "widget") { // NodeJS does not have String.endsWith()
+          widgetId += "-widget";
+        }
+      }
+      
+      if (widget["class-name"]) {
+        // TODO make sure widget class name is valid
+      }
+      else {
+        widget["class-name"] = makeValidClassName(widgetId);
+      }
 
-      // TODO: make sure both widget-id and widget-class-name are present
+      // TODO: make sure widget-id and widget class name are unique
       
       // we need new replacement object for every widget
       var widgetReplacements = replacements.map(function(item) { return item; } );
 
-      
       widgetReplacements.push(makeReplacementObject("plugin-widget-name", buildParams["plugin-name"] + " Widget"));
       widgetReplacements.push(makeReplacementObject("plugin-widget-class-name", widget["class-name"]));
-      widgetReplacements.push(makeReplacementObject("plugin-widget-id", widget.id));
+      widgetReplacements.push(makeReplacementObject("plugin-widget-id", widgetId));
 
       grunt.log.debug("replacements: " + JSON.stringify(widgetReplacements));
       
       
-      // add a new task for string replacement
+      // add a new string-replace task for this widget
       stringReplaceTask[widget.id] = {
         options: {
           replacements: widgetReplacements
@@ -240,6 +279,7 @@ module.exports = function(grunt) {
         ]
       }; 
       
+      // add a new fileregexrename task for this widget
       fileRenameTask[widget.id] = {
         options: {
           replacements: widgetReplacements
@@ -247,9 +287,11 @@ module.exports = function(grunt) {
         files: [ { expand: true, cwd: distdir, src: "**/*{plugin-widget*.*", dest: distdir }]
       }
       
+      // add string-replace task in default taks list for this widget
       taskList.push("string-replace:" + widget.id);
+      // add fileregexrename task in default taks list for this widget
       taskList.push("fileregexrename:" + widget.id);
-      widgetFiles.push("class-" + widget.id + ".php");
+      widgetFiles.push("class-" + widgetId + ".php");
       
     }); // end widgets.forEach
     

@@ -1,1 +1,5 @@
-/* This stylesheet is used to style the public view of the {plugin-widget-id} widget. */
+/**
+ * Public facing stylesheet for {plugin-widget-id}.
+ *
+// @include ../../temp/header-comments.txt
+ */

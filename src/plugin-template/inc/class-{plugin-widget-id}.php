@@ -18,9 +18,9 @@ class {plugin-widget-class-name} extends WP_Widget {
    * Specifies the classname and description, instantiates the widget,
    * loads localization files, and includes necessary stylesheets and JavaScript.
    */
-  public function __construct() {
+  public function {plugin-widget-class-name}() {
 
-    // TODO:  update classname and description
+    // TODO:  update description
     parent::__construct(
       "{plugin-widget-id}", /* Widget id */
       __( "{plugin-widget-name}", "{plugin-slug}" ), /* Widget Name that appears as title of widget in admin area */
@@ -36,10 +36,6 @@ class {plugin-widget-class-name} extends WP_Widget {
 
   } // end constructor
 
-  /*--------------------------------------------------*/
-  /* Widget API Functions
-  /*--------------------------------------------------*/
-
   /**
    * Outputs the content of the widget.
    *
@@ -54,7 +50,7 @@ class {plugin-widget-class-name} extends WP_Widget {
 
     // TODO:  Here is where you manipulate your widget's values based on their input fields
 
-    include( {plugin-class-name-upper}_PLUGIN_DIR . "/views/{plugin-widget-id}.php" );
+    include( {plugin-class-name}_Info::$plugin_dir . "/views/{plugin-widget-id}.php" );
 
     echo $after_widget;
 
@@ -91,26 +87,22 @@ class {plugin-widget-class-name} extends WP_Widget {
     // TODO:  Store the values of the widget in their own variable
 
     // Display the admin form
-    include( {plugin-class-name-upper}_PLUGIN_DIR . "/views/{plugin-widget-id}-admin.php" );
+    include( {plugin-class-name}_Info::$plugin_dir . "/views/{plugin-widget-id}-admin.php" );
 
   } // end form
-
-  /*--------------------------------------------------*/
-  /* Public Functions
-  /*--------------------------------------------------*/
 
   /**
    * Registers and enqueues widget-specific styles.
    */
   public function register_widget_styles() {
-    wp_enqueue_style( "{plugin-widget-id}-styles", {plugin-class-name-upper}_PLUGIN_URL . "/css/{plugin-widget-id}.css" );
+    wp_enqueue_style( "{plugin-widget-id}-styles", {plugin-class-name}_Info::$plugin_url . "/css/{plugin-widget-id}.css" );
   }
 
   /**
    * Registers and enqueues widget-specific scripts.
    */
   public function register_widget_scripts() {
-    wp_enqueue_script( "{plugin-widget-id}-script", {plugin-class-name-upper}_PLUGIN_URL . "/js/{plugin-widget-id}.js", array("jquery") );
+    wp_enqueue_script( "{plugin-widget-id}-script", {plugin-class-name}_Info::$plugin_url . "/js/{plugin-widget-id}.js", array("jquery") );
   }
   
   public static function register_widget() {

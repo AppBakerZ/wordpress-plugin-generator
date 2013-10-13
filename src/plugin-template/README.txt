@@ -2,9 +2,9 @@
 Contributors: (this should be a list of wordpress.org userids)
 Donate link: http://example.com/
 Tags: comments, spam
-Requires at least: 3.5.1
+Requires at least: 3.0
 Tested up to: 3.6
-Stable tag: 1.0.0
+Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -39,23 +39,18 @@ you put the stable version, in order to eliminate any doubt.
 
 == Installation ==
 
-This section describes how to install the plugin and get it working.
-
-e.g.
-
-1. Upload `{plugin-slug}.php` to the `/wp-content/plugins/` directory
+1. Copy the zip file to the `/wp-content/plugins/` directory
 1. Activate the plugin through the 'Plugins' menu in WordPress
-1. Place `<?php do_action('plugin_name_hook'); ?>` in your templates
 
 == Frequently Asked Questions ==
 
-= A question that someone might have =
+= Question 1 =
 
 An answer to that question.
 
-= What about foo bar? =
+= Question 2 =
 
-Answer to foo bar dilemma.
+An answer to that question.
 
 == Screenshots ==
 

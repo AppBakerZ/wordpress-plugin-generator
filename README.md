@@ -34,6 +34,10 @@ grunt
 
 A directory named dist would be created and would have the generated code for your wordpress plugin.
 
+### Sample Plugins:
+
+1. [Tweetability](https://github.com/kashiif/tweetability)
+
 ### Credits
 The generated code for wordpress plugins mainly comes from the awesome [WordPress Plugin Boilerplate](https://github.com/tommcfarlin/WordPress-Plugin-Boilerplate) by [Tom McFarlin](http://tommcfarlin.com/).
 

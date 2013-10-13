@@ -1,10 +1,7 @@
 <?php
 /**
- * The WordPress Plugin Boilerplate.
- *
- * A foundation off of which to build well-documented WordPress plugins that also follow
- * WordPress coding standards and PHP best practices.
- *
+ * {plugin-desc}
+ * 
 // @include ../temp/header-comments.txt
  *
  * @wordpress-plugin
@@ -63,22 +60,37 @@ class {plugin-class-name}_Info {
 
     public static $plugin_basename = '';
 
-  	public static function init_static() {
+    /**
+     * This function is called once on plugin load. It will initialize the static variables and also sets up appropriate hooks .
+     *
+     * @since    0.1.0
+     */
+  	public static function init() {
       self::$plugin_dir = untrailingslashit( dirname( __FILE__ ) );
       self::$plugin_url = untrailingslashit( plugins_url( '', __FILE__ ) );
       self::$plugin_basename = plugin_basename( __FILE__ );
-    }    
+      
+      // @ifdef SETTINGSPAGE
+      // Load admin only when required
+      add_action( 'admin_menu', array('{plugin-class-name}_Info','handle_admin_menu') );
+      // @endif
+    }
+    
+    // @ifdef SETTINGSPAGE
+    public static function handle_admin_menu() {
+      require(plugin_dir_path(__FILE__) . 'inc/admin-settings.php');
+      $admin = {plugin-class-name}_Admin::get_instance();
+      $admin->handle_admin_menu();
+    }
+    // @endif
 
 }
 
-{plugin-class-name}_Info::init_static();
+{plugin-class-name}_Info::init();
 
 // include plugin's class file
 require( plugin_dir_path( __FILE__ ) . 'inc/class-{plugin-slug}.php' );
 
-// @ifdef SETTINGSPAGE
-require( plugin_dir_path( __FILE__ ) . 'inc/admin-settings.php' );
-// @endif
 
 // @ifdef WIDGETS
 // @include ../temp/widgets.php

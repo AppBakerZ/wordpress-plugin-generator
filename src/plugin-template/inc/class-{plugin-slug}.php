@@ -17,23 +17,17 @@ class {plugin-class-name} {
 	/**
 	 * Initialize the plugin by setting localization, filters, and administration functions.
 	 *
-	 * @since     1.0.0
+	 * @since     0.1.0
 	 */
-	private function __construct() {
-
-		// Load plugin text domain
-		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
-
-		// Load public-facing style sheet and JavaScript.
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-
+	private function {plugin-class-name}() {
+		// Handle init
+		add_action( 'init', array( $this, 'handle_init' ) );
 	}
 
 	/**
 	 * Return an instance of this class.
 	 *
-	 * @since     1.0.0
+	 * @since     0.1.0
 	 * @return    object    A single instance of this class.
 	 */
 	public static function get_instance() {
@@ -45,6 +39,21 @@ class {plugin-class-name} {
 
 		return self::$instance;
 	}
+
+  /**
+   * Handles init action.
+   *
+   * @since     0.2.0
+   * @return    void
+   */
+  public function handle_init() {
+    $this->load_plugin_textdomain();
+    $this->register_script_and_style();
+
+		// Load public-facing style sheet and JavaScript.
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+  }
 
 	/**
 	 * Fired when the plugin is activated.
@@ -81,7 +90,7 @@ class {plugin-class-name} {
 	 *
 	 * @since    0.1.0
 	 */
-	public function load_plugin_textdomain() {
+	private function load_plugin_textdomain() {
 
 		$domain = {plugin-class-name}_Info::slug;
 		$locale = apply_filters( 'plugin_locale', get_locale(), $domain );
@@ -90,13 +99,30 @@ class {plugin-class-name} {
 		load_plugin_textdomain( $domain, FALSE, {plugin-class-name}_Info::slug . '/lang/' );
 	}
 
+  /**
+   * Register public-facing script and style sheet. These would be enqueued later only when necessary.
+   *
+   * @since    0.2.0
+   */
+  private function register_script_and_style() {
+    wp_register_script( {plugin-class-name}_Info::slug . '-plugin-script',
+                        {plugin-class-name}_Info::$plugin_url . '/js/public.js',
+                        array( 'jquery' ),
+                        {plugin-class-name}_Info::version );
+
+    wp_register_style( {plugin-class-name}_Info::slug . '-plugin-style',
+                      {plugin-class-name}_Info::$plugin_url . '/css/public.css',
+                      array(),
+                      {plugin-class-name}_Info::version );
+  }
+
 	/**
 	 * Register and enqueue public-facing style sheet.
 	 *
 	 * @since    0.1.0
 	 */
 	public function enqueue_styles() {
-		wp_enqueue_style( {plugin-class-name}_Info::slug . '-plugin-styles', {plugin-class-name}_Info::$plugin_url . '/css/public.css', array(), {plugin-class-name}_Info::version );
+    wp_enqueue_style({plugin-class-name}_Info::slug . '-plugin-style');
 	}
 
 	/**
@@ -105,7 +131,7 @@ class {plugin-class-name} {
 	 * @since    0.1.0
 	 */
 	public function enqueue_scripts() {
-		wp_enqueue_script( {plugin-class-name}_Info::slug . '-plugin-script', {plugin-class-name}_Info::$plugin_url . '/js/public.js', array( 'jquery' ), {plugin-class-name}_Info::version );
+    wp_enqueue_script({plugin-class-name}_Info::slug . '-plugin-script');
 	}
 
 }

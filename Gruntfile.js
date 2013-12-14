@@ -152,7 +152,7 @@ module.exports = function(grunt) {
 	// Grunt project configuration.
   var cfg = {
 
-	clean: ["dist/", distdirRoot + "temp/"],
+	clean: [distdirRoot + "temp/", distdirRoot + buildParams["plugin-slug"], "dist/"],
   
   "string-replace": {
 	  prod: {
@@ -161,9 +161,10 @@ module.exports = function(grunt) {
       },
 
       files: [
-        // Note that .php files are copied as .php.js. This is to hack preprocess to think .php.js file as js files
+        // Note that .php/.css files are copied as .php.js/.css.js. This is to hack preprocess to think .php.js file as js files
         {expand: true, cwd: "src/plugin-template", src : phpSourceFiles,  dest: distdir, ext: ".php.js" },
-        {expand: true, cwd: "src/plugin-template", src : ["**/*.*", "!**/*.php", "!**/*plugin-widget*.*"],  dest: distdir },
+        {expand: true, cwd: "src/plugin-template", src : ["**/*.css"],  dest: distdir, ext: ".css.js" },
+        {expand: true, cwd: "src/plugin-template", src : ["**/*.*", "!**/*.css", "!**/*.php", "!**/*plugin-widget*.*"],  dest: distdir },
         {expand: true, cwd: "src/grunt-includes", src : ["**/*.*"],  dest: distdirRoot + "temp" }
         ]
     },
@@ -192,7 +193,7 @@ module.exports = function(grunt) {
       options: {
         inline: true,
       },
-      src : [ 'dist/**/*.php.js'] 
+      src : [ 'dist/**/*.php.js', 'dist/**/*.js', 'dist/**/*.css.js' ] 
     }
     
   }
@@ -275,7 +276,7 @@ module.exports = function(grunt) {
         },
         files: [
           {expand: true, cwd: "src/plugin-template", src : ["**/*{plugin-widget*.php"],  dest: distdir, ext: ".php.js" },
-          {expand: true, cwd: "src/plugin-template", src : ["**/*{plugin-widget*.*", "!**/*.php"],  dest: distdir }
+          {expand: true, cwd: "src/plugin-template", src : ["**/*{plugin-widget*.*", "!**/*.php", "!**/*.css"],  dest: distdir }
         ]
       }; 
       
@@ -347,8 +348,12 @@ module.exports = function(grunt) {
       });
 
       found.files.forEach(function(item){
-        // if the file extension is .php.js, change it to .php
-        if(item.substr(item.length-7) == ".php.js") {
+        // if the file extension is .php.js or .css.js, remove the trailing .js
+        var trail = item.substr(item.length-7);
+        
+        if(trail == ".php.js" 
+          || trail == ".css.js"
+          ) {
           fs.renameSync(item, item.substr(0, item.length-3));
         }
       });

@@ -1,0 +1,6 @@
+*.sublime-*
+dist/*
+node_modules/
+.idea/
+temp/
+tmp/

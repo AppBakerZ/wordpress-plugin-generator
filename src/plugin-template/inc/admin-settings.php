@@ -140,23 +140,23 @@ class {plugin-class-name}_Admin {
       <?php 
         settings_fields( '{plugin-slug}-settings-group' ); 
         do_settings_sections( {plugin-class-name}_Info::settings_page_slug ); 
-        $this->render_submit_button();
+        $this->render_submit_button(__( 'Save Changes' ), '{plugin-slug}-submit');
       ?>
       </form>
     </div>
     <?php
   }
   
-  private function render_submit_button() {
+  private function render_submit_button($localized_label, $name) {
     // submit_button was introduced in WP 3.1.0 so fallback to submit button html for older versions
     if (function_exists('submit_button')) {
-      submit_button();
+      submit_button($localized_label , 'primary' , $name );
       return;
     }
     ?>
 
     <p class="submit">
-      <input type="submit" name="submit" id="submit" class="button button-primary" value="<?php echo _( 'Save Changes' ); ?>"/>
+      <input type="submit" name="$name" id="$name" class="button button-primary" value="<?php echo _( 'Save Changes' ); ?>"/>
     </p>
 
     <?php
@@ -225,9 +225,10 @@ class {plugin-class-name}_Admin {
 
   public function add_text_field( $args ) {
     $field_name = $args['field_name'];
+    $field_type = isset( $args['field_type'] ) ? $args['field_type'] : 'text';
     
     $field = isset($this->settings[$field_name]) ? esc_attr(  $this->settings[$field_name] ) : "";
-    echo "<input class='regular-text' type='text' name='{plugin-slug}-settings[$field_name]' value='$field' />";
+    echo "<input class='regular-text' type='$field_type' name='{plugin-slug}-settings[$field_name]' value='$field' />";
     
     if ( isset( $args['help_text'] ) ) {
       echo "<p class='description'>" . $args['help_text'] . "</p>";

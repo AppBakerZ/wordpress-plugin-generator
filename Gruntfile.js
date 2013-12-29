@@ -289,9 +289,9 @@ module.exports = function(grunt) {
         files: [ { expand: true, cwd: distdir, src: "**/*{plugin-widget*.*", dest: distdir }]
       }
       
-      // add string-replace task in default taks list for this widget
+      // add string-replace task in default task list for this widget
       taskList.push("string-replace:" + widget.id);
-      // add fileregexrename task in default taks list for this widget
+      // add fileregexrename task in default task list for this widget
       taskList.push("fileregexrename:" + widget.id);
       widgetFiles.push("class-" + widgetId + ".php");
       

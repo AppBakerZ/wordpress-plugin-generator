@@ -182,6 +182,12 @@ class {plugin-class-name}_Admin {
                   'general_settings_section'
                 );
     
+
+// @ifdef SETTINGS
+// @include ../../temp/settings.txt
+// @endif
+
+    /*
     $this->add_section( $sections[0], __('REQUIRED_SETTING_TITLE', '{plugin-slug}'), 'add_required_settings_section' );
     $this->add_section( $sections[1], __('GENERAL_SETTING_TITLE', '{plugin-slug}'), 'add_general_settings_section' );
 
@@ -213,6 +219,8 @@ class {plugin-class-name}_Admin {
                         $page,
                         $sections[1],
                         array('field_name' => 'gen-setting-2') );
+
+    */
   }
   
   private function add_section($section, $localized_title, $function_name) {

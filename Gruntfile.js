@@ -70,6 +70,11 @@ function makeReplacementObject(key, value) {
       replacement: value
     }
 }
+
+var RE_WORD_BOUNDARY = new RegExp("\\s", "g");
+function makeWpId(str) {
+  return str.toLowerCase().replace(RE_WORD_BOUNDARY, "-");
+}
  
 module.exports = function(grunt) {
 
@@ -87,6 +92,7 @@ module.exports = function(grunt) {
         "plugin-slug": "",
         "plugin-desc": "",
         "plugin-uri": "",
+        "settings": {},
         "options": {
           "settings-page": true,
           "widgets": []
@@ -218,13 +224,13 @@ module.exports = function(grunt) {
   // don't copy widget related files, these will be included in a separate files object
   phpSourceFiles.push( "!**/*{plugin-widget*.*" );
 
+  var stringReplaceTask = cfg["string-replace"],
+      fileRenameTask = cfg["fileregexrename"]
+
   var widgets = buildParams.options.widgets,
       widgetFiles = [];
   
   if (widgets.length > 0) {
-
-    var stringReplaceTask = cfg["string-replace"],
-        fileRenameTask = cfg["fileregexrename"]
 
     // Set preprocessor context variable so it is available for grunt-preprocess @ifdef
     preprocessContext["WIDGETS"] = true;
@@ -298,6 +304,106 @@ module.exports = function(grunt) {
     }); // end widgets.forEach
     
   }
+
+  var settings = buildParams.settings,
+      settingFiles = [];
+
+  settings = {
+      "page1" : {
+        "Section 1" : {
+          "field 1": "f1",
+          "field 2": "f2"
+        },
+        "Section 2" : {
+          "field 1": "f1",
+          "field 2": "f2"
+        }
+
+      }
+    }
+  
+
+
+  if (settings && Object.keys(settings).length > 0) {
+    // Set preprocessor context variable so it is available for grunt-preprocess @ifdef
+    preprocessContext["SETTINGS"] = true;
+
+    grunt.log.debug("found settings");
+    // found atleast one property in setting object
+    for (var pageProp in settings) {
+      var page = settings[pageProp];
+      // TODO: for now, we support only one page
+      grunt.log.debug("page: " + pageProp);
+      var sectionIndex = 0;
+
+      for (var sectionProp in page) {
+        // Each property of a page is a section
+        grunt.log.debug("section: " + sectionProp);
+        var section = page[sectionProp];
+            sectionTitle = sectionProp,
+            sectionId = makeWpId(sectionTitle);
+
+        // we need new replacement object for every setting
+        var sectionReplacements = replacements.map(function(item) { return item; } );
+        sectionReplacements.push(makeReplacementObject("section-title", sectionTitle));
+        sectionReplacements.push(makeReplacementObject("section-id", sectionId));
+        sectionReplacements.push(makeReplacementObject("section-index", sectionIndex++));
+
+        // add a new string-replace task for this section
+        var taskId = sectionId,
+            filename = distdirRoot + "temp2/" + taskId + ".txt";
+
+        var files = {};
+        files[filename] = "src/grunt-includes/setting-section.txt";
+
+        stringReplaceTask[taskId] = {
+          options: {
+            replacements: sectionReplacements
+          },
+          files: files
+        }; 
+        settingFiles.push(filename);
+
+        // add string-replace task in default task list for this section
+        taskList.push("string-replace:" + taskId);
+
+        for (var settingProp in section) {
+          grunt.log.debug("setting: " + settingProp);
+          // Each property of a page is a section
+          var setting = section[settingProp];
+              settingName = setting,
+              settingId = makeWpId(settingName);
+          
+          // we need new replacement object for every setting
+          var settingReplacements = sectionReplacements.map(function(item) { return item; } );
+          settingReplacements.push(makeReplacementObject("setting-name", settingName));
+          settingReplacements.push(makeReplacementObject("setting-id", settingId));
+
+          taskId = sectionId + "-" + settingId;
+          filename = distdirRoot + "temp2/" + taskId + ".txt";
+
+          files = {};
+          files[filename] = "src/grunt-includes/setting-field.txt";
+
+
+          stringReplaceTask[taskId] = {
+            options: {
+              replacements: settingReplacements
+            },
+            files: files
+          }; 
+          settingFiles.push(filename);
+
+          // add string-replace task in default task list for this section
+          taskList.push("string-replace:" + taskId);
+        }
+
+
+      }
+
+    }
+  }
+
     
   grunt.initConfig(cfg);
 
@@ -327,6 +433,24 @@ module.exports = function(grunt) {
   // dynamic and inside a falsy @ifdef block. 
   // We need to add the task to default task list so that widgets.php is always generated.
   taskList.push("generate-widget-include-file");
+
+
+  grunt.registerTask("generate-settings-include-file", "Generates temp2/settings.txt to be included in plugin file", function() {
+    var fs = require("fs");
+
+    var contents = [];
+
+    if (settingFiles.length) {
+      var contents = settingFiles.map(function(item){
+          return fs.readFileSync(item);
+        });
+    }
+    
+    fs.writeFileSync(distdirRoot + "temp/settings.txt", contents.join("\r\n"));
+    
+  });
+ taskList.push("generate-settings-include-file");
+
 
   grunt.registerTask("perform-final-tasks", "Copies empty index.php file to every folder", function() {
     

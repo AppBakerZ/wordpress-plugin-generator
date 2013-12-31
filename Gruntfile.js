@@ -76,6 +76,10 @@ function makeWpId(str) {
   return str.toLowerCase().replace(RE_WORD_BOUNDARY, "-");
 }
  
+function makeWpFunctionName(str) {
+  return str.toLowerCase().replace(RE_WORD_BOUNDARY, "_");
+}
+
 module.exports = function(grunt) {
 
   var path  = require("path");
@@ -306,8 +310,10 @@ module.exports = function(grunt) {
   }
 
   var settings = buildParams.settings,
-      settingFiles = [];
+      settingFiles = []
+      sectionIds = [];
 
+  /*    
   settings = {
       "page1" : {
         "Section 1" : {
@@ -321,7 +327,7 @@ module.exports = function(grunt) {
 
       }
     }
-  
+  */
 
 
   if (settings && Object.keys(settings).length > 0) {
@@ -341,12 +347,18 @@ module.exports = function(grunt) {
         grunt.log.debug("section: " + sectionProp);
         var section = page[sectionProp];
             sectionTitle = sectionProp,
-            sectionId = makeWpId(sectionTitle);
-
+            sectionId = makeWpId(sectionTitle),
+            sectionMethod = makeWpFunctionName(sectionTitle);
+            
+        if (sectionMethod.substr(sectionMethod.length-7) == "section") {
+          sectionMethod = sectionMethod.substr(0, sectionMethod.length-8);
+        }
+            
         // we need new replacement object for every setting
         var sectionReplacements = replacements.map(function(item) { return item; } );
         sectionReplacements.push(makeReplacementObject("section-title", sectionTitle));
         sectionReplacements.push(makeReplacementObject("section-id", sectionId));
+        sectionReplacements.push(makeReplacementObject("section-method", sectionMethod));
         sectionReplacements.push(makeReplacementObject("section-index", sectionIndex++));
 
         // add a new string-replace task for this section
@@ -362,6 +374,8 @@ module.exports = function(grunt) {
           },
           files: files
         }; 
+        
+        sectionIds.push(buildParams["plugin-slug"] + "-" + sectionId);
         settingFiles.push(filename);
 
         // add string-replace task in default task list for this section
@@ -438,15 +452,26 @@ module.exports = function(grunt) {
   grunt.registerTask("generate-settings-include-file", "Generates temp2/settings.txt to be included in plugin file", function() {
     var fs = require("fs");
 
+    var spaces = "    ",
+    spaces4 = spaces + spaces + spaces + spaces;
+    
+    var codeLines = [
+                      spaces + "// Make " + sectionIds.length + " Sections",
+                      spaces + "$sections = array(", 
+                      spaces4 + '"' + sectionIds.join('",\r\n' + spaces4 + '"') + '"' , 
+                      spaces + spaces + ");",
+                      "\r\n"
+                    ];
+                    
     var contents = [];
 
     if (settingFiles.length) {
-      var contents = settingFiles.map(function(item){
+      contents = settingFiles.map(function(item){
           return fs.readFileSync(item);
         });
     }
     
-    fs.writeFileSync(distdirRoot + "temp/settings.txt", contents.join("\r\n"));
+    fs.writeFileSync(distdirRoot + "temp/settings.txt", codeLines.join("\r\n") + contents.join("\r\n"));
     
   });
  taskList.push("generate-settings-include-file");

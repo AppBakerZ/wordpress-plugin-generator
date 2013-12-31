@@ -176,51 +176,10 @@ class {plugin-class-name}_Admin {
    
     $page = {plugin-class-name}_Info::settings_page_slug;
 
-    // Make 2 Sections
-    $sections = array(
-                  'required_settings_section', 
-                  'general_settings_section'
-                );
-    
-
 // @ifdef SETTINGS
 // @include ../../temp/settings.txt
 // @endif
 
-    /*
-    $this->add_section( $sections[0], __('REQUIRED_SETTING_TITLE', '{plugin-slug}'), 'add_required_settings_section' );
-    $this->add_section( $sections[1], __('GENERAL_SETTING_TITLE', '{plugin-slug}'), 'add_general_settings_section' );
-
-
-    // Fields - Required Settings section
-    add_settings_field( '{plugin-slug}-req-setting-1', 
-                        __('REQUIRED_SETTING_1', '{plugin-slug}'),
-                        array($this, 'add_text_field'),
-                        $page,
-                        $sections[0],
-                        array('field_name' => 'req-setting-1') );
-    add_settings_field( '{plugin-slug}-req-setting-2',
-                        __('REQUIRED_SETTING_2', '{plugin-slug}'),
-                        array($this, 'add_text_field'),
-                        $page,
-                        $sections[0],
-                        array('field_name' => 'req-setting-2') );
-
-    // Fields - General Settings section
-    add_settings_field( '{plugin-slug}-gen-setting-1',
-                        __('GENERAL_SETTING_1', '{plugin-slug}'),
-                        array($this, 'add_text_field'),
-                        $page,
-                        $sections[1],
-                        array('field_name' => 'gen-setting-1') );
-    add_settings_field( '{plugin-slug}-gen-setting-2',
-                        __('GENERAL_SETTING_2', '{plugin-slug}'),
-                        array($this, 'add_text_field'),
-                        $page,
-                        $sections[1],
-                        array('field_name' => 'gen-setting-2') );
-
-    */
   }
   
   private function add_section($section, $localized_title, $function_name) {
@@ -231,7 +190,7 @@ class {plugin-class-name}_Admin {
                         );
   }
 
-  public function add_text_field( $args ) {
+  public function add_input_field( $args ) {
     $field_name = $args['field_name'];
     $field_type = isset( $args['field_type'] ) ? $args['field_type'] : 'text';
     

@@ -11,6 +11,24 @@
   "plugin-desc": "",
   "plugin-uri": "",
 
+  
+  "settings": {
+      "page1" : {
+        "Required" : {
+          "field 1": "f1",
+          "field 2": "f2"
+        },
+        "Optional" : {
+          "field 3": "f3",
+          "field 4": "f4"
+        },
+        "Global" : {
+          "field 5": "f5",
+          "field 6": "f6"
+        }
+      }
+    },  
+  
   "options": {
     "settings-page": true,
     "widgets": [

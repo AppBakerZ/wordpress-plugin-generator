@@ -1,6 +1,6 @@
-    add_settings_field( '{plugin-slug}-{setting-id}', 
+    add_settings_field( '{setting-id}', 
                         __('{setting-name}', '{plugin-slug}'),
-                        array($this, 'add_text_field'),
+                        array($this, 'add_input_field'),
                         $page,
                         $sections[{section-index}],
                         array('field_name' => '{setting-id}') );

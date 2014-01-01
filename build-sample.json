@@ -15,16 +15,23 @@
   "settings": {
       "page1" : {
         "Required" : {
-          "field 1": "f1",
-          "field 2": "f2"
+          "field 1": "text",
+          "field 2": "number"
         },
         "Optional" : {
-          "field 3": "f3",
-          "field 4": "f4"
+          "field 3": {
+            "type": "select",
+            "items": {
+                "ask": "Always Ask",
+                "allow": "Always Allow",
+                "deny": "Never Allow",
+              }
+            },
+          "field 4": ""
         },
         "Global" : {
-          "field 5": "f5",
-          "field 6": "f6"
+          "field 5": "",
+          "field 6": ""
         }
       }
     },  

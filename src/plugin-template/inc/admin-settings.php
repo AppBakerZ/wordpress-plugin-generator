@@ -190,17 +190,55 @@ class {plugin-class-name}_Admin {
                         );
   }
 
-  public function add_input_field( $args ) {
+
+  private function render_field_help_text( $args ) {
+    if ( isset( $args['help_text'] ) ) {
+      echo "<p class='description'>" . $args['help_text'] . "</p>";
+    }    
+  }
+
+  public function render_input_field( $args ) {
     $field_name = $args['field_name'];
     $field_type = isset( $args['field_type'] ) ? $args['field_type'] : 'text';
     
-    $field = isset($this->settings[$field_name]) ? esc_attr(  $this->settings[$field_name] ) : "";
+    $field = esc_attr(  $this->settings[$field_name] );
     echo "<input class='regular-text' type='$field_type' name='{plugin-slug}-settings[$field_name]' value='$field' />";
-    
-    if ( isset( $args['help_text'] ) ) {
-      echo "<p class='description'>" . $args['help_text'] . "</p>";
-    }
+    $this->render_field_help_text( $args );
   }
+
+
+  // This function will create dynamic drop down.
+  public function render_select_field($args) {
+  
+    $field_name = $args['field_name'];
+    $field = esc_attr($this->settings[$field_name]);
+    $options = $args['options'];
+  
+    echo "<select name='{plugin-slug}-settings[$field_name]'>";
+    /* With the help of key we will retrieve label and value from array, Key contain index of array and
+       value contain label and value */
+    foreach($options as $value => $label) {
+      echo "<option " . selected($field, $value, false) . " value='$value'>$label</option>";
+    }
+
+    echo "</select>";
+
+    $this->render_field_help_text( $args );
+  }
+
+  // This function creates checkboxes and it will call in callback function
+  public function render_checkbox_field($args) {
+    $field_name = $args['field_name'];
+    $field = esc_attr($this->settings[$field_name]);
+    $options = $args['options'];
+
+    foreach($options as $value => $label) {
+      echo "<input class='regular-checkbox' type='checkbox'" . checked( $field, $value, false ) . "name='{plugin-slug}-settings[$field_name]' value='$value'/>";
+    }
+
+    $this->render_field_help_text( $args );
+  }
+
 
 // @ifdef SETTINGS
 // @include ../../temp/sections-functions.inc

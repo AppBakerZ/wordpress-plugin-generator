@@ -125,19 +125,18 @@ module.exports = function(grunt) {
       }
   }
 
-  var re = new RegExp("\\s", "g");
 	if (buildParams["plugin-slug"]) {
     // TODO: validate that plugin-slug should not contain invalid chars
   } else {
     // auto generated plugin-slug should be a valid file-system name
-    buildParams["plugin-slug"] = buildParams["plugin-name"].toLowerCase().replace(re, "-");
+    buildParams["plugin-slug"] = buildParams["plugin-name"].toLowerCase().replace(RE_WORD_BOUNDARY, "-");
   }
 
 	if (buildParams["plugin-class-name"]) {
     // TODO: validate that className is valid identifier
   } else {
     // auto generated plugin-class-name should be a valid identifier
-    buildParams["plugin-class-name"] = makeValidIdentifier(buildParams["plugin-name"].replace(re, "_"));
+    buildParams["plugin-class-name"] = makeValidIdentifier(buildParams["plugin-name"].replace(RE_WORD_BOUNDARY, "_"));
   }
   buildParams["plugin-class-name-upper"] = buildParams["plugin-class-name"].toUpperCase();
 
@@ -407,6 +406,19 @@ module.exports = function(grunt) {
           var settingReplacements = sectionReplacements.map(function(item) { return item; } );
           settingReplacements.push(makeReplacementObject("setting-name", settingName));
           settingReplacements.push(makeReplacementObject("setting-id", settingId));
+
+          var settingType = "",
+              settingCallbackFunction = "render_input_field";
+          if (typeof(setting) == "string") {
+            settingType = (setting.length > 0) ? setting : "text";
+          }
+          else if (typeof(setting) == "object") {
+            settingType = setting["type"];
+            
+          }
+
+
+          settingReplacements.push(makeReplacementObject("setting-type", settingType));
 
           taskId = sectionId + "-" + settingId;
           filename = distdirRoot + "temp2/" + taskId + ".txt";

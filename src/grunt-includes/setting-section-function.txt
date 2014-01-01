@@ -1,7 +1,7 @@
   /**
   * Displays the descriptive text for {section-title} section.
-  * Could be any html
+  * Could be any html.
   */
-  public function add_required_settings_section() { 
+  public function render_{section-function}_section() { 
     printf(__('{section-title} description', '{plugin-slug}'));
   }

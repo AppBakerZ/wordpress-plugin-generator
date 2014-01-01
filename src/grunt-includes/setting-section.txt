@@ -2,4 +2,4 @@
      * {section-title} section
      ********************************************/
 
-    $this->add_section( $sections[{section-index}], __('{section-title}', '{plugin-slug}'), 'render_{section-method}_section' );
+    $this->add_section( $sections[{section-index}], __('{section-title}', '{plugin-slug}'), 'render_{section-function}_section' );

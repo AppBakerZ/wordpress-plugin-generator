@@ -32,7 +32,7 @@ function extend(defaults, override){
     return defaults;
 }
 
-function copyValueIfMissing(obj, key1, key2, extra){ 
+function copyValueIfMissing(obj, key1, key2, extra){
   if (!obj.hasOwnProperty(key1) || obj[key1].length == 0) {
     obj[key1] = obj[key2] + (extra? " " + extra: "");
   }
@@ -73,11 +73,11 @@ function makeReplacementObject(key, value) {
 
 var RE_WORD_BOUNDARY = new RegExp("\\s", "g");
 function makeWpId(str) {
-  return str.toLowerCase().replace(RE_WORD_BOUNDARY, "-");
+  return str.toString().toLowerCase().replace(RE_WORD_BOUNDARY, "-");
 }
- 
+
 function makeWpFunctionName(str) {
-  return str.toLowerCase().replace(RE_WORD_BOUNDARY, "_");
+  return str.toString().toLowerCase().replace(RE_WORD_BOUNDARY, "_");
 }
 
 module.exports = function(grunt) {
@@ -102,17 +102,17 @@ module.exports = function(grunt) {
           "widgets": []
         },
       };
-  
+
   // Valid that user has provided values for required parameters in build.json
   var missing = ["plugin-name", "author-name", "author-email"].filter(function(item) {
-      var v = userParams[item]; 
+      var v = userParams[item];
       return (!v || v.trim().length == 0);
     });
-    
+
   if (missing.length) {
     grunt.fail.fatal("Not found valid values for: " + missing);
     return;
-  }  
+  }
 
   // Use default values for parameters not in build.json
   extend(buildParams, userParams);
@@ -124,7 +124,7 @@ module.exports = function(grunt) {
         }
       }
   }
-  
+
   var re = new RegExp("\\s", "g");
 	if (buildParams["plugin-slug"]) {
     // TODO: validate that plugin-slug should not contain invalid chars
@@ -132,7 +132,7 @@ module.exports = function(grunt) {
     // auto generated plugin-slug should be a valid file-system name
     buildParams["plugin-slug"] = buildParams["plugin-name"].toLowerCase().replace(re, "-");
   }
-  
+
 	if (buildParams["plugin-class-name"]) {
     // TODO: validate that className is valid identifier
   } else {
@@ -140,21 +140,22 @@ module.exports = function(grunt) {
     buildParams["plugin-class-name"] = makeValidIdentifier(buildParams["plugin-name"].replace(re, "_"));
   }
   buildParams["plugin-class-name-upper"] = buildParams["plugin-class-name"].toUpperCase();
-  
+
   copyValueIfMissing(buildParams, "plugin-desc", "plugin-name", "Short Description");
   copyValueIfMissing(buildParams, "owner-name", "author-name");
   copyValueIfMissing(buildParams, "owner-email", "author-email");
   copyValueIfMissing(buildParams, "owner-uri", "author-uri");
 
 	var distdirRoot = "dist/",
+      tempdir = distdirRoot + "temp/",
       distdir = distdirRoot + buildParams["plugin-slug"] + "/", // The path to package directory
       replacements = [];
-  
+
   for(key in buildParams) {
       if(buildParams.hasOwnProperty(key)) {
           replacements.push(makeReplacementObject(key, buildParams[key]));
       }
-  } 
+  }
 
 	var phpSourceFiles = ["**/*.php"];
   // Grunt default task list
@@ -163,7 +164,14 @@ module.exports = function(grunt) {
   var cfg = {
 
 	clean: [distdirRoot + "temp/", distdirRoot + buildParams["plugin-slug"], "dist/"],
-  
+
+  concat: {
+    "prod": {
+      src : [distdirRoot + "temp2/*-function.txt"],
+      dest: tempdir + 'sections-functions.inc'
+    }
+  },
+
   "string-replace": {
 	  prod: {
       options: {
@@ -179,7 +187,7 @@ module.exports = function(grunt) {
         ]
     },
 	},
-  
+
 
 	fileregexrename: {
 	  prod: {
@@ -189,9 +197,9 @@ module.exports = function(grunt) {
       files: [ { expand: true, cwd: distdir, src: "**/*.*", dest: distdir }]
 
 	  },
-	  
+
 	},
-  
+
   preprocess: {
     options: {
       // NOTE that if context is defined in the task, it will replace the global context, (not merge it)
@@ -203,28 +211,28 @@ module.exports = function(grunt) {
       options: {
         inline: true,
       },
-      src : [ 'dist/**/*.php.js', 'dist/**/*.js', 'dist/**/*.css.js' ] 
+      src : [ 'dist/**/*.php.js', 'dist/**/*.js', 'dist/**/*.css.js' ]
     }
-    
+
   }
-  
+
 	};
-  
+
   var preprocessContext = cfg.preprocess.options.context;
-  
+
   for(var prop in buildParams.options) {
     var opt = buildParams.options[prop];
     if ((typeof opt == "boolean" && opt) || (typeof opt == "Array" && opt.length > 0)) {
-      
+
       var key = prop.toUpperCase().replace(/-/g, "");
       preprocessContext[key] = opt;
     }
   }
-  
+
   if (buildParams.options["settings-page"] !== true) {
     phpSourceFiles.push("!**inc/admin-settings.php");
   }
-  
+
   // don't copy widget related files, these will be included in a separate files object
   phpSourceFiles.push( "!**/*{plugin-widget*.*" );
 
@@ -233,14 +241,14 @@ module.exports = function(grunt) {
 
   var widgets = buildParams.options.widgets,
       widgetFiles = [];
-  
+
   if (widgets.length > 0) {
 
     // Set preprocessor context variable so it is available for grunt-preprocess @ifdef
     preprocessContext["WIDGETS"] = true;
 
     widgets.forEach(function(widget, arg2, arg3) {
-    
+
       grunt.log.debug("widgets.forEach: " + widget + ", " + arg2 + ", " + arg3);
 
       // Valid that one of widget-id and widget-class-name are present
@@ -248,7 +256,7 @@ module.exports = function(grunt) {
         grunt.log.fail("You should provide id for every widget.");
         return;
       }
-      
+
       var widgetId = widget.id;
       // if widget id does not ends with "widget", make it so
       if (widgetId.length < 6) {
@@ -259,7 +267,7 @@ module.exports = function(grunt) {
           widgetId += "-widget";
         }
       }
-      
+
       if (widget["class-name"]) {
         // TODO make sure widget class name is valid
       }
@@ -268,7 +276,7 @@ module.exports = function(grunt) {
       }
 
       // TODO: make sure widget-id and widget class name are unique
-      
+
       // we need new replacement object for every widget
       var widgetReplacements = replacements.map(function(item) { return item; } );
 
@@ -277,8 +285,8 @@ module.exports = function(grunt) {
       widgetReplacements.push(makeReplacementObject("plugin-widget-id", widgetId));
 
       grunt.log.debug("replacements: " + JSON.stringify(widgetReplacements));
-      
-      
+
+
       // add a new string-replace task for this widget
       stringReplaceTask[widget.id] = {
         options: {
@@ -289,8 +297,8 @@ module.exports = function(grunt) {
           {expand: true, cwd: "src/plugin-template", src : ["**/*{plugin-widget*.css"],  dest: distdir, ext: ".css.js" },
           {expand: true, cwd: "src/plugin-template", src : ["**/*{plugin-widget*.*", "!**/*.php", "!**/*.css"],  dest: distdir }
         ]
-      }; 
-      
+      };
+
       // add a new fileregexrename task for this widget
       fileRenameTask[widget.id] = {
         options: {
@@ -298,22 +306,22 @@ module.exports = function(grunt) {
         },
         files: [ { expand: true, cwd: distdir, src: "**/*{plugin-widget*.*", dest: distdir }]
       }
-      
+
       // add string-replace task in default task list for this widget
       taskList.push("string-replace:" + widget.id);
       // add fileregexrename task in default task list for this widget
       taskList.push("fileregexrename:" + widget.id);
       widgetFiles.push("class-" + widgetId + ".php");
-      
+
     }); // end widgets.forEach
-    
+
   }
 
   var settings = buildParams.settings,
       settingFiles = []
       sectionIds = [];
 
-  /*    
+  /*
   settings = {
       "page1" : {
         "Section 1" : {
@@ -349,22 +357,23 @@ module.exports = function(grunt) {
             sectionTitle = sectionProp,
             sectionId = makeWpId(sectionTitle),
             sectionMethod = makeWpFunctionName(sectionTitle);
-            
+
         if (sectionMethod.substr(sectionMethod.length-7) == "section") {
           sectionMethod = sectionMethod.substr(0, sectionMethod.length-8);
         }
-            
+
         // we need new replacement object for every setting
         var sectionReplacements = replacements.map(function(item) { return item; } );
         sectionReplacements.push(makeReplacementObject("section-title", sectionTitle));
         sectionReplacements.push(makeReplacementObject("section-id", sectionId));
-        sectionReplacements.push(makeReplacementObject("section-method", sectionMethod));
+        sectionReplacements.push(makeReplacementObject("section-function", sectionMethod));
         sectionReplacements.push(makeReplacementObject("section-index", sectionIndex++));
 
         // add a new string-replace task for this section
         var taskId = sectionId,
             filename = distdirRoot + "temp2/" + taskId + ".txt";
 
+        // generate file for section code to be used inside handle_admin_init()
         var files = {};
         files[filename] = "src/grunt-includes/setting-section.txt";
 
@@ -373,21 +382,27 @@ module.exports = function(grunt) {
             replacements: sectionReplacements
           },
           files: files
-        }; 
-        
+        };
+
         sectionIds.push(buildParams["plugin-slug"] + "-" + sectionId);
         settingFiles.push(filename);
 
         // add string-replace task in default task list for this section
         taskList.push("string-replace:" + taskId);
 
+        // generate file for section callback
+        taskId = taskId + "-function";
+        filename = distdirRoot + "temp2/" + taskId + ".txt";
+        files[filename] = "src/grunt-includes/setting-section-function.txt";
+
+
         for (var settingProp in section) {
           grunt.log.debug("setting: " + settingProp);
           // Each property of a page is a section
           var setting = section[settingProp];
-              settingName = setting,
+              settingName = settingProp,
               settingId = makeWpId(settingName);
-          
+
           // we need new replacement object for every setting
           var settingReplacements = sectionReplacements.map(function(item) { return item; } );
           settingReplacements.push(makeReplacementObject("setting-name", settingName));
@@ -405,7 +420,7 @@ module.exports = function(grunt) {
               replacements: settingReplacements
             },
             files: files
-          }; 
+          };
           settingFiles.push(filename);
 
           // add string-replace task in default task list for this section
@@ -418,14 +433,15 @@ module.exports = function(grunt) {
     }
   }
 
-    
+
   grunt.initConfig(cfg);
 
 	grunt.loadNpmTasks("grunt-contrib-clean");
+  grunt.loadNpmTasks("grunt-contrib-concat");
 	grunt.loadNpmTasks('grunt-preprocess');
   grunt.loadNpmTasks("grunt-string-replace");
   grunt.loadNpmTasks("grunt-file-regex-rename");
-  
+
   grunt.registerTask("generate-widget-include-file", "Generates temp/widgets.php to be included in plugin file", function() {
     var fs = require("fs");
 
@@ -434,35 +450,35 @@ module.exports = function(grunt) {
     if (widgetFiles.length) {
       var l = "require( plugin_dir_path( __FILE__ ) . 'inc/admin-settings.php' );"
 
-      
+
       var contents = widgetFiles.map(function(item){
           return "require( plugin_dir_path( __FILE__ ) . 'inc/" + item + "' );"
-        });    
+        });
     }
-    
+
     fs.writeFileSync(distdirRoot + "temp/widgets.php", contents.join("\r\n"));
-    
+
   });
   // The preprocess plugin requires that every include file must be present even if the include is
-  // dynamic and inside a falsy @ifdef block. 
+  // dynamic and inside a falsy @ifdef block.
   // We need to add the task to default task list so that widgets.php is always generated.
   taskList.push("generate-widget-include-file");
 
 
-  grunt.registerTask("generate-settings-include-file", "Generates temp2/settings.txt to be included in plugin file", function() {
+  grunt.registerTask("generate-settings-include-file", "Generates temp2/handle_admin_init.txt to be included in plugin file", function() {
     var fs = require("fs");
 
     var spaces = "    ",
     spaces4 = spaces + spaces + spaces + spaces;
-    
+
     var codeLines = [
                       spaces + "// Make " + sectionIds.length + " Sections",
-                      spaces + "$sections = array(", 
-                      spaces4 + '"' + sectionIds.join('",\r\n' + spaces4 + '"') + '"' , 
+                      spaces + "$sections = array(",
+                      spaces4 + '"' + sectionIds.join('",\r\n' + spaces4 + '"') + '"' ,
                       spaces + spaces + ");",
                       "\r\n"
                     ];
-                    
+
     var contents = [];
 
     if (settingFiles.length) {
@@ -470,21 +486,21 @@ module.exports = function(grunt) {
           return fs.readFileSync(item);
         });
     }
-    
-    fs.writeFileSync(distdirRoot + "temp/settings.txt", codeLines.join("\r\n") + contents.join("\r\n"));
-    
+
+    fs.writeFileSync(distdirRoot + "temp/handle_admin_init.txt", codeLines.join("\r\n") + contents.join("\r\n"));
+
   });
  taskList.push("generate-settings-include-file");
 
 
   grunt.registerTask("perform-final-tasks", "Copies empty index.php file to every folder", function() {
-    
+
     // Force task into async mode and grab a handle to the "done" function.
     var done = this.async();
 
     var fs = require('fs'),
         copyHelper  = require("./grunt-modules/copyhelper");
-    
+
     copyHelper.walk(distdir, function(error, found) {
 
       if (error) {
@@ -500,8 +516,8 @@ module.exports = function(grunt) {
       found.files.forEach(function(item){
         // if the file extension is .php.js or .css.js, remove the trailing .js
         var trail = item.substr(item.length-7);
-        
-        if(trail == ".php.js" 
+
+        if(trail == ".php.js"
           || trail == ".css.js"
           ) {
           fs.renameSync(item, item.substr(0, item.length-3));
@@ -509,17 +525,18 @@ module.exports = function(grunt) {
       });
 
 
-      
+
       done();
 
     });
 
-    
+
   });
 
 	// Default task(s).
-  taskList.push("preprocess");  
+  taskList.push("concat");
+  taskList.push("preprocess");
   taskList.push("perform-final-tasks");
-  
+
 	grunt.registerTask("default", taskList);
 };

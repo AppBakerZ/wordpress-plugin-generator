@@ -177,7 +177,7 @@ class {plugin-class-name}_Admin {
     $page = {plugin-class-name}_Info::settings_page_slug;
 
 // @ifdef SETTINGS
-// @include ../../temp/settings.txt
+// @include ../../temp/handle_admin_init.txt
 // @endif
 
   }
@@ -202,25 +202,10 @@ class {plugin-class-name}_Admin {
     }
   }
 
-  /********************** General Settings Related **********************/
+// @ifdef SETTINGS
+// @include ../../temp/sections-functions.inc
+// @endif
 
-  /**
-  * Displays the descriptive text for general settings section
-  * Could be any html
-  */
-  public function add_general_settings_section() {
-    printf(__('GENERAL_SETTING_AREA_DESCRIPTION', '{plugin-slug}'));
-  }
-
-  /********************** Required Settings Related **********************/
-  
-  /**
-  * Displays the descriptive text for required settings section.
-  * Could be any html
-  */
-  public function add_required_settings_section() { 
-    printf(__('REQUIRED_SETTING_AREA_DESCRIPTION', '{plugin-slug}'));
-  }
 
   /********************** Validation for Options Form **********************/
   

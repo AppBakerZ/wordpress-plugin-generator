@@ -376,6 +376,7 @@ module.exports = function(grunt) {
         var files = {};
         files[filename] = "src/grunt-includes/setting-section.txt";
 
+        // Generate setting-section.txt for every section
         stringReplaceTask[taskId] = {
           options: {
             replacements: sectionReplacements
@@ -389,7 +390,7 @@ module.exports = function(grunt) {
         // add string-replace task in default task list for this section
         taskList.push("string-replace:" + taskId);
 
-        // generate file for section callback
+        // generate file for section callback function
         taskId = taskId + "-function";
         filename = distdirRoot + "temp2/" + taskId + ".txt";
         files[filename] = "src/grunt-includes/setting-section-function.txt";
@@ -397,7 +398,7 @@ module.exports = function(grunt) {
 
         for (var settingProp in section) {
           grunt.log.debug("setting: " + settingProp);
-          // Each property of a page is a section
+          // Each property of a section is setting
           var setting = section[settingProp];
               settingName = settingProp,
               settingId = makeWpId(settingName);
@@ -415,6 +416,9 @@ module.exports = function(grunt) {
           else if (typeof(setting) == "object") {
             settingType = setting["type"];
             
+            
+
+
           }
 
 

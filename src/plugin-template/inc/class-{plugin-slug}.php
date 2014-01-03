@@ -6,39 +6,39 @@
  */
 class {plugin-class-name} {
 
-	/**
-	 * Instance of this class.
-	 *
-	 * @since    0.1.0
-	 * @var      object
-	 */
-	protected static $instance = null;
+  /**
+   * Instance of this class.
+   *
+   * @since    0.1.0
+   * @var      object
+   */
+  protected static $instance = null;
 
-	/**
-	 * Initialize the plugin by setting localization, filters, and administration functions.
-	 *
-	 * @since     0.1.0
-	 */
-	private function {plugin-class-name}() {
-		// Handle init
-		add_action( 'init', array( $this, 'handle_init' ) );
-	}
+  /**
+   * Initialize the plugin by setting localization, filters, and administration functions.
+   *
+   * @since     0.1.0
+   */
+  private function {plugin-class-name}() {
+  	// Handle init
+  	add_action( 'init', array( $this, 'handle_init' ) );
+  }
 
-	/**
-	 * Return an instance of this class.
-	 *
-	 * @since     0.1.0
-	 * @return    object    A single instance of this class.
-	 */
-	public static function get_instance() {
+  /**
+   * Return an instance of this class.
+   *
+   * @since     0.1.0
+   * @return    object    A single instance of this class.
+   */
+  public static function get_instance() {
 
-		// If the single instance hasn't been set, set it now.
-		if ( null == self::$instance ) {
-			self::$instance = new self;
-		}
+  	// If the single instance hasn't been set, set it now.
+  	if ( null == self::$instance ) {
+  		self::$instance = new self;
+  	}
 
-		return self::$instance;
-	}
+  	return self::$instance;
+  }
 
   /**
    * Handles init action.
@@ -82,7 +82,7 @@ class {plugin-class-name} {
 	 * @param    boolean    $network_wide    True if WPMU superadmin uses "Network Deactivate" action, false if WPMU is disabled or plugin is deactivated on an individual blog.
 	 */
 	public static function deactivate( $network_wide ) {
-		// TODO: Define deactivation functionality here
+		// Define deactivation functionality here
 	}
 
 	/**
@@ -102,36 +102,36 @@ class {plugin-class-name} {
   /**
    * Register public-facing script and style sheet. These would be enqueued later only when necessary.
    *
-   * @since    0.2.0
+   * @since    0.1.0
    */
   private function register_script_and_style() {
     wp_register_script( {plugin-class-name}_Info::slug . '-plugin-script',
-                        {plugin-class-name}_Info::$plugin_url . '/js/public.js',
+                        {plugin-class-name}_Info::$plugin_url . '/assets/js/public.js',
                         array( 'jquery' ),
                         {plugin-class-name}_Info::version );
 
     wp_register_style( {plugin-class-name}_Info::slug . '-plugin-style',
-                      {plugin-class-name}_Info::$plugin_url . '/css/public.css',
+                      {plugin-class-name}_Info::$plugin_url . '/assets/css/public.css',
                       array(),
                       {plugin-class-name}_Info::version );
   }
 
-	/**
-	 * Register and enqueue public-facing style sheet.
-	 *
-	 * @since    0.1.0
-	 */
-	public function enqueue_styles() {
+  /**
+   * Register and enqueue public-facing style sheet.
+   *
+   * @since    0.1.0
+   */
+  public function enqueue_styles() {
     wp_enqueue_style({plugin-class-name}_Info::slug . '-plugin-style');
-	}
+  }
 
-	/**
-	 * Register and enqueues public-facing JavaScript files.
-	 *
-	 * @since    0.1.0
-	 */
-	public function enqueue_scripts() {
+  /**
+   * Register and enqueues public-facing JavaScript files.
+   *
+   * @since    0.1.0
+   */
+  public function enqueue_scripts() {
     wp_enqueue_script({plugin-class-name}_Info::slug . '-plugin-script');
-	}
+  }
 
 }

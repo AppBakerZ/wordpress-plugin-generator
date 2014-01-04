@@ -38,32 +38,6 @@ function copyValueIfMissing(obj, key1, key2, extra){
   }
 }
 
-function isValidIdentifier(name) {
-  return true;
-}
-
-function makeValidIdentifier(name) {
-  return name.trim().replace(/\W+/g, "");
-}
-
-/**
-* Converts the given String into a valid Class name
-*/
-function makeValidClassName(theString) {
-  var name = theString.replace(/[^a-z|A-Z|\-|_|\s|0-9]/g, "");
-  name = name.split(/[-|_|\s]/g);
-  for (var w=0 ; w<name.length; w++) {
-    var word = name[w];
-    if (word.length > 1) {
-      name[w] = (word[0].toUpperCase()) + word.substr(1);
-    }
-    else {
-      name[w] = word.toUpperCase();
-    }
-  }
-  return name.join("");
-}
-
 function makeReplacementObject(key, value) {
   return {
       pattern: new RegExp("\{" + key + "\}", "g"),
@@ -71,14 +45,7 @@ function makeReplacementObject(key, value) {
     }
 }
 
-var RE_WORD_BOUNDARY = new RegExp("\\s", "g");
-function makeWpId(str) {
-  return str.toString().toLowerCase().replace(RE_WORD_BOUNDARY, "-");
-}
-
-function makeWpFunctionName(str) {
-  return str.toString().toLowerCase().replace(RE_WORD_BOUNDARY, "_");
-}
+var namingHelper = require("./grunt-modules/naming-helper.js");
 
 module.exports = function(grunt) {
 
@@ -129,14 +96,14 @@ module.exports = function(grunt) {
     // TODO: validate that plugin-slug should not contain invalid chars
   } else {
     // auto generated plugin-slug should be a valid file-system name
-    buildParams["plugin-slug"] = buildParams["plugin-name"].toLowerCase().replace(RE_WORD_BOUNDARY, "-");
+    buildParams["plugin-slug"] = buildParams["plugin-name"].toLowerCase().replace(namingHelper.RE_WORD_BOUNDARY, "-");
   }
 
 	if (buildParams["plugin-class-name"]) {
     // TODO: validate that className is valid identifier
   } else {
     // auto generated plugin-class-name should be a valid identifier
-    buildParams["plugin-class-name"] = makeValidIdentifier(buildParams["plugin-name"].replace(RE_WORD_BOUNDARY, "_"));
+    buildParams["plugin-class-name"] = namingHelper.makeValidIdentifier(buildParams["plugin-name"].replace(namingHelper.RE_WORD_BOUNDARY, "_"));
   }
   buildParams["plugin-class-name-upper"] = buildParams["plugin-class-name"].toUpperCase();
 
@@ -156,13 +123,15 @@ module.exports = function(grunt) {
       }
   }
 
-	var phpSourceFiles = ["**/*.php"];
+  // don't copy widget/custom-post related files, these will be included in a separate files object
+	var phpSourceFiles = ["**/*.php", "!**/*{plugin-widget*.*", "!**/*-custom-post.*"];
+
   // Grunt default task list
   var taskList = ["clean", "string-replace:prod",  "fileregexrename:prod"];
 	// Grunt project configuration.
   var cfg = {
 
-	clean: [distdirRoot + "temp/", distdirRoot + buildParams["plugin-slug"], "dist/"],
+	clean: [tempdir, distdirRoot + "temp2/", distdirRoot + buildParams["plugin-slug"], "dist/"],
 
   concat: {
     "prod": {
@@ -181,8 +150,8 @@ module.exports = function(grunt) {
         // Note that .php/.css files are copied as .php.js/.css.js. This is to hack preprocess to think .php.js file as js files
         {expand: true, cwd: "src/plugin-template", src : phpSourceFiles,  dest: distdir, ext: ".php.js" },
         {expand: true, cwd: "src/plugin-template", src : ["**/*.css", "!**/*plugin-widget*.css"],  dest: distdir, ext: ".css.js" },
-        {expand: true, cwd: "src/plugin-template", src : ["**/*.*", "!**/*.css", "!**/*.php", "!**/*plugin-widget*.*"],  dest: distdir },
-        {expand: true, cwd: "src/grunt-includes", src : ["**/*.*"],  dest: distdirRoot + "temp" }
+        {expand: true, cwd: "src/plugin-template", src : ["**/*.*", "!**/*.css", "!**/*.php", "!**/*plugin-widget*.*", "!**/*-custom-post.*"],  dest: distdir },
+        {expand: true, cwd: "src/grunt-includes", src : ["**/*.*"],  dest: tempdir }
         ]
     },
 	},
@@ -232,9 +201,6 @@ module.exports = function(grunt) {
     phpSourceFiles.push("!**inc/admin-settings.php");
   }
 
-  // don't copy widget related files, these will be included in a separate files object
-  phpSourceFiles.push( "!**/*{plugin-widget*.*" );
-
   var stringReplaceTask = cfg["string-replace"],
       fileRenameTask = cfg["fileregexrename"]
 
@@ -271,7 +237,7 @@ module.exports = function(grunt) {
         // TODO make sure widget class name is valid
       }
       else {
-        widget["class-name"] = makeValidClassName(widgetId);
+        widget["class-name"] = namingHelper.makeValidClassName(widgetId);
       }
 
       // TODO: make sure widget-id and widget class name are unique
@@ -320,22 +286,6 @@ module.exports = function(grunt) {
       settingFiles = []
       sectionIds = [];
 
-  /*
-  settings = {
-      "page1" : {
-        "Section 1" : {
-          "field 1": "f1",
-          "field 2": "f2"
-        },
-        "Section 2" : {
-          "field 1": "f1",
-          "field 2": "f2"
-        }
-
-      }
-    }
-  */
-
 
   if (settings && Object.keys(settings).length > 0) {
     // Set preprocessor context variable so it is available for grunt-preprocess @ifdef
@@ -354,8 +304,8 @@ module.exports = function(grunt) {
         grunt.log.debug("section: " + sectionProp);
         var section = page[sectionProp];
             sectionTitle = sectionProp,
-            sectionId = makeWpId(sectionTitle),
-            sectionMethod = makeWpFunctionName(sectionTitle);
+            sectionId = namingHelper.makeWpId(sectionTitle),
+            sectionMethod = namingHelper.makeWpFunctionName(sectionTitle);
 
         if (sectionMethod.substr(sectionMethod.length-7) == "section") {
           sectionMethod = sectionMethod.substr(0, sectionMethod.length-8);
@@ -401,7 +351,7 @@ module.exports = function(grunt) {
           // Each property of a section is setting
           var setting = section[settingProp];
               settingName = settingProp,
-              settingId = makeWpId(settingName);
+              settingId = namingHelper.makeWpId(settingName);
 
           // we need new replacement object for every setting
           var settingReplacements = sectionReplacements.map(function(item) { return item; } );
@@ -472,7 +422,7 @@ module.exports = function(grunt) {
         });
     }
 
-    fs.writeFileSync(distdirRoot + "temp/widgets.php", contents.join("\r\n"));
+    fs.writeFileSync(tempdir + "widgets.php", contents.join("\r\n"));
 
   });
   // The preprocess plugin requires that every include file must be present even if the include is
@@ -503,7 +453,7 @@ module.exports = function(grunt) {
         });
     }
 
-    fs.writeFileSync(distdirRoot + "temp/handle_admin_init.txt", codeLines.join("\r\n") + contents.join("\r\n"));
+    fs.writeFileSync(tempdir + "handle_admin_init.txt", codeLines.join("\r\n") + contents.join("\r\n"));
 
   });
  taskList.push("generate-settings-include-file");

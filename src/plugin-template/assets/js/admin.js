@@ -1,7 +1,7 @@
 /**
  * {plugin-name} js file for admin
  *
-// @include ../../temp/header-comments.txt
+// @include ../../../temp/header-comments.txt
  */
 
 (function ($) {

@@ -182,7 +182,14 @@ module.exports = function(grunt) {
       src : [ 'dist/**/*.php.js', 'dist/**/*.js', 'dist/**/*.css.js' ]
     }
 
+  },
+
+  "generate-widget-include-file": {
+    prod : {
+      files: [ { src: [] , dest: tempdir + "widgets.php" }]
+    }
   }
+
 
 	};
 
@@ -280,7 +287,14 @@ module.exports = function(grunt) {
 
     }); // end widgets.forEach
 
+    cfg["generate-widget-include-file"].prod.files[0].src = widgetFiles;
+
   }
+
+  // The preprocess plugin requires that every include file must be present even if the include is
+  // dynamic and inside a falsy @ifdef block.
+  // We need to add the task to default task list even when no widget so that widgets.php is always generated.
+  taskList.push("generate-widget-include-file");
 
   var settings = buildParams.settings,
       settingFiles = []
@@ -408,28 +422,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-string-replace");
   grunt.loadNpmTasks("grunt-file-regex-rename");
 
-  grunt.registerTask("generate-widget-include-file", "Generates temp/widgets.php to be included in plugin file", function() {
-    var fs = require("fs");
-
-    var contents = [];
-
-    if (widgetFiles.length) {
-      var l = "require( plugin_dir_path( __FILE__ ) . 'inc/admin-settings.php' );"
-
-
-      var contents = widgetFiles.map(function(item){
-          return "require( plugin_dir_path( __FILE__ ) . 'inc/" + item + "' );"
-        });
-    }
-
-    fs.writeFileSync(tempdir + "widgets.php", contents.join("\r\n"));
-
-  });
-  // The preprocess plugin requires that every include file must be present even if the include is
-  // dynamic and inside a falsy @ifdef block.
-  // We need to add the task to default task list so that widgets.php is always generated.
-  taskList.push("generate-widget-include-file");
-
+  grunt.loadTasks("./grunt-modules/tasks/");
 
   grunt.registerTask("generate-settings-include-file", "Generates temp2/handle_admin_init.txt to be included in plugin file", function() {
     var fs = require("fs");

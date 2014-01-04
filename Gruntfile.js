@@ -38,14 +38,8 @@ function copyValueIfMissing(obj, key1, key2, extra){
   }
 }
 
-function makeReplacementObject(key, value) {
-  return {
-      pattern: new RegExp("\{" + key + "\}", "g"),
-      replacement: value
-    }
-}
-
-var namingHelper = require("./grunt-modules/naming-helper.js");
+var namingHelper = require("./grunt-modules/naming-helper.js"),
+    taskUtils    = require("./grunt-modules/task-utils.js");
 
 module.exports = function(grunt) {
 
@@ -119,7 +113,7 @@ module.exports = function(grunt) {
 
   for(key in buildParams) {
       if(buildParams.hasOwnProperty(key)) {
-          replacements.push(makeReplacementObject(key, buildParams[key]));
+          replacements.push(taskUtils.makeReplacementObject(key, buildParams[key]));
       }
   }
 
@@ -216,12 +210,14 @@ module.exports = function(grunt) {
 
   if (widgets.length > 0) {
 
+    var widgetHandler = require("./grunt-modules/widget-handler.js");
+
     // Set preprocessor context variable so it is available for grunt-preprocess @ifdef
     preprocessContext["WIDGETS"] = true;
 
-    widgets.forEach(function(widget, arg2, arg3) {
+    widgets.forEach(function(widget) {
 
-      grunt.log.debug("widgets.forEach: " + widget + ", " + arg2 + ", " + arg3);
+      grunt.log.debug("widgets.forEach: " + widget );
 
       // Valid that one of widget-id and widget-class-name are present
       if (!widget.id) {
@@ -229,61 +225,19 @@ module.exports = function(grunt) {
         return;
       }
 
-      var widgetId = widget.id;
-      // if widget id does not ends with "widget", make it so
-      if (widgetId.length < 6) {
-        widgetId += "widget";
-      }
-      else {
-        if (widgetId.substr(widgetId.length-6).toLowerCase() != "widget") { // NodeJS does not have String.endsWith()
-          widgetId += "-widget";
-        }
-      }
-
-      if (widget["class-name"]) {
-        // TODO make sure widget class name is valid
-      }
-      else {
-        widget["class-name"] = namingHelper.makeValidClassName(widgetId);
-      }
-
-      // TODO: make sure widget-id and widget class name are unique
-
-      // we need new replacement object for every widget
-      var widgetReplacements = replacements.map(function(item) { return item; } );
-
-      widgetReplacements.push(makeReplacementObject("plugin-widget-name", buildParams["plugin-name"] + " Widget"));
-      widgetReplacements.push(makeReplacementObject("plugin-widget-class-name", widget["class-name"]));
-      widgetReplacements.push(makeReplacementObject("plugin-widget-id", widgetId));
-
-      grunt.log.debug("replacements: " + JSON.stringify(widgetReplacements));
-
+      var widgetResults = widgetHandler.generate(grunt, widget, buildParams, replacements, distdir);
 
       // add a new string-replace task for this widget
-      stringReplaceTask[widget.id] = {
-        options: {
-          replacements: widgetReplacements
-        },
-        files: [
-          {expand: true, cwd: "src/plugin-template", src : ["**/*{plugin-widget*.php"],  dest: distdir, ext: ".php.js" },
-          {expand: true, cwd: "src/plugin-template", src : ["**/*{plugin-widget*.css"],  dest: distdir, ext: ".css.js" },
-          {expand: true, cwd: "src/plugin-template", src : ["**/*{plugin-widget*.*", "!**/*.php", "!**/*.css"],  dest: distdir }
-        ]
-      };
+      stringReplaceTask[widget.id] = widgetResults["string-replace"];
 
       // add a new fileregexrename task for this widget
-      fileRenameTask[widget.id] = {
-        options: {
-          replacements: widgetReplacements
-        },
-        files: [ { expand: true, cwd: distdir, src: "**/*{plugin-widget*.*", dest: distdir }]
-      }
+      fileRenameTask[widget.id] = widgetResults["fileregexrename"];
 
       // add string-replace task in default task list for this widget
       taskList.push("string-replace:" + widget.id);
       // add fileregexrename task in default task list for this widget
       taskList.push("fileregexrename:" + widget.id);
-      widgetFiles.push("class-" + widgetId + ".php");
+      widgetFiles.push("class-" + widgetResults.widgetId + ".php");
 
     }); // end widgets.forEach
 
@@ -327,10 +281,10 @@ module.exports = function(grunt) {
 
         // we need new replacement object for every setting
         var sectionReplacements = replacements.map(function(item) { return item; } );
-        sectionReplacements.push(makeReplacementObject("section-title", sectionTitle));
-        sectionReplacements.push(makeReplacementObject("section-id", sectionId));
-        sectionReplacements.push(makeReplacementObject("section-function", sectionMethod));
-        sectionReplacements.push(makeReplacementObject("section-index", sectionIndex++));
+        sectionReplacements.push(taskUtils.makeReplacementObject("section-title", sectionTitle));
+        sectionReplacements.push(taskUtils.makeReplacementObject("section-id", sectionId));
+        sectionReplacements.push(taskUtils.makeReplacementObject("section-function", sectionMethod));
+        sectionReplacements.push(taskUtils.makeReplacementObject("section-index", sectionIndex++));
 
         // add a new string-replace task for this section
         var taskId = sectionId,
@@ -369,8 +323,8 @@ module.exports = function(grunt) {
 
           // we need new replacement object for every setting
           var settingReplacements = sectionReplacements.map(function(item) { return item; } );
-          settingReplacements.push(makeReplacementObject("setting-name", settingName));
-          settingReplacements.push(makeReplacementObject("setting-id", settingId));
+          settingReplacements.push(taskUtils.makeReplacementObject("setting-name", settingName));
+          settingReplacements.push(taskUtils.makeReplacementObject("setting-id", settingId));
 
           var settingType = "",
               settingCallbackFunction = "render_input_field";
@@ -386,7 +340,7 @@ module.exports = function(grunt) {
           }
 
 
-          settingReplacements.push(makeReplacementObject("setting-type", settingType));
+          settingReplacements.push(taskUtils.makeReplacementObject("setting-type", settingType));
 
           taskId = sectionId + "-" + settingId;
           filename = distdirRoot + "temp2/" + taskId + ".txt";

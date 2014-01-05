@@ -1,8 +1,9 @@
     add_settings_field( '{setting-id}', __('{setting-name}', '{plugin-slug}'),
-                        array($this, 'render_select_field'),
+                        array($this, 'render_checkbox_or_radio_field'),
                         $page, $sections[{section-index}],
                         array(
                             'field_name' => '{setting-id}',
                             'help_text'  => __('{setting-help-text}', '{plugin-slug}'),
-                            'options' => array({setting-select-options})
+                            'options' => array({setting-select-options}),
+                            'field_type' => '{setting-type}',
                         ));

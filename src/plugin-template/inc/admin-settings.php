@@ -197,6 +197,14 @@ class {plugin-class-name}_Admin {
     }    
   }
 
+  /**
+   * Outputs html for a <input> element corrsponding a setting.
+   * This function is called as a callback function for a setting.
+   *
+   * @param $args Array of values tc customize <input> element
+   *  field_type: Value of type attribute of <input> element. Should be one of text, url, number, email
+   *  field_name: Value used in name attribute of <input> element
+   */
   public function render_input_field( $args ) {
     $field_name = $args['field_name'];
     $field_type = isset( $args['field_type'] ) ? $args['field_type'] : 'text';
@@ -207,7 +215,15 @@ class {plugin-class-name}_Admin {
   }
 
 
-  // This function will create dynamic drop down.
+  /**
+   * Outputs html for a <select> element corresponding a setting.
+   * This function is called as a callback function for a setting.
+   *
+   * @param $args Array of values tc customize <select> element
+   *  field_type: Value of type attribute of <select> element. Should be one of text, url, number, email
+   *  field_name: Value used in name attribute of <select> element
+   *  options: Associative array having value => label entries. Each array element woulb become an <option> element.
+   */
   public function render_select_field($args) {
   
     $field_name = $args['field_name'];
@@ -226,14 +242,24 @@ class {plugin-class-name}_Admin {
     $this->render_field_help_text( $args );
   }
 
-  // This function creates checkboxes and it will call in callback function
-  public function render_checkbox_field($args) {
+  /**
+   * Outputs html for a <input type="checkbox/radio"> element corrsponding a setting.
+   * This function is called as a callback function for a setting.
+   *
+   * @param $args Array of values tc customize <input> element
+   *  field_type: Value of type attribute of <input> element. Should be one of text, url, number, email
+   *  field_name: Value used in name attribute of <input> element
+   */
+  public function render_checkbox_or_radio_field($args) {
     $field_name = $args['field_name'];
+    $field_type = $args['field_type'];
     $field = esc_attr($this->settings[$field_name]);
     $options = $args['options'];
 
     foreach($options as $value => $label) {
-      echo "<input class='regular-checkbox' type='checkbox'" . checked( $field, $value, false ) . "name='{plugin-slug}-settings[$field_name]' value='$value'/>";
+      echo "<label>";
+      echo "<input class='regular-checkbox' type='$field_type'" . checked( $field, $value, false ) . "name='{plugin-slug}-settings[$field_name]' value='$value'/>";
+      echo "</label> $label";
     }
 
     $this->render_field_help_text( $args );

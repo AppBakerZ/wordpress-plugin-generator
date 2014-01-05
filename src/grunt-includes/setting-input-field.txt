@@ -3,6 +3,6 @@
                         $page, $sections[{section-index}],
                         array(
                             'field_name' => '{setting-id}',
-                        	  'field_type' => '{setting-type}',
-                            'help_text'  => __('Help text for {setting-name}', '{plugin-slug}')
+                            'help_text'  => __('{setting-help-text}', '{plugin-slug}'),
+                        	  'field_type' => '{setting-type}'
                         ));

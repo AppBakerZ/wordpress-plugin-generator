@@ -3,5 +3,5 @@
   * Could be any html.
   */
   public function render_{section-function}_section() { 
-    printf(__('{section-title} description', '{plugin-slug}'));
+    printf(__('description of {section-title} section', '{plugin-slug}'));
   }

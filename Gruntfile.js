@@ -314,39 +314,87 @@ module.exports = function(grunt) {
         files[filename] = "src/grunt-includes/setting-section-function.txt";
 
 
+        // Each property of a section is setting
         for (var settingProp in section) {
           grunt.log.debug("setting: " + settingProp);
-          // Each property of a section is setting
+
           var setting = section[settingProp];
               settingName = settingProp,
               settingId = namingHelper.makeWpId(settingName);
+
+          // supported setting types are text, number, checkbox, select, radio
+          var settingType = "text",
+              settingCallbackFunction = "render_input_field",
+              settingHelpText = "Help text for " + settingName, 
+              settingFilenameSlug = "input",
+              typeOfSetting = typeof(setting),
+              settingOptions = {};
+
+          if (typeOfSetting == "string") {
+            if (setting.length > 0) {
+              settingType = setting;
+            }
+          }
+          else if (typeOfSetting == "object") {
+            settingType = setting["type"];
+
+            if (setting.hasOwnProperty("options")) {
+              settingOptions = setting.options;  
+            }
+
+            if (setting.hasOwnProperty("helptext")) {
+              settingHelpText = setting.helptext;  
+            }
+          }
+
+          switch (settingType) {
+            case "select":
+              settingCallbackFunction = "render_select_field";
+              settingFilenameSlug = "select";
+              break;
+
+            case "checkbox":
+              settingCallbackFunction = "render_checkbox_field";
+              settingFilenameSlug = "checkbox";
+              break;
+
+            case "radio":
+              settingCallbackFunction = "render_radio_field";
+              settingFilenameSlug = "radio";
+              break;
+
+            default:
+              // be default we have initilized values for a text field
+              break;
+          }
+
+          var settingOptionsText = "",
+              settingOptionsCount = Object.keys(settingOptions).length;
+          if (settingOptionsCount > 0) {
+            settingOptionsText += "\r\n";
+            for (var optName in settingOptions) {
+              settingOptionsText += "                              " 
+                                 + optName + ' => "' + settingOptions[optName] + '"'
+                                 + (--settingOptionsCount > 0? ",": "")
+                                 + "\r\n";
+            }            
+            settingOptionsText += "                              " 
+          }
+
 
           // we need new replacement object for every setting
           var settingReplacements = sectionReplacements.map(function(item) { return item; } );
           settingReplacements.push(taskUtils.makeReplacementObject("setting-name", settingName));
           settingReplacements.push(taskUtils.makeReplacementObject("setting-id", settingId));
-
-          var settingType = "",
-              settingCallbackFunction = "render_input_field";
-          if (typeof(setting) == "string") {
-            settingType = (setting.length > 0) ? setting : "text";
-          }
-          else if (typeof(setting) == "object") {
-            settingType = setting["type"];
-            
-            
-
-
-          }
-
-
           settingReplacements.push(taskUtils.makeReplacementObject("setting-type", settingType));
+          settingReplacements.push(taskUtils.makeReplacementObject("setting-help-text", settingHelpText));
+          settingReplacements.push(taskUtils.makeReplacementObject("setting-select-options", settingOptionsText));
 
           taskId = sectionId + "-" + settingId;
           filename = distdirRoot + "temp2/" + taskId + ".txt";
 
           files = {};
-          files[filename] = "src/grunt-includes/setting-field.txt";
+          files[filename] = "src/grunt-includes/setting-" + settingFilenameSlug + "-field.txt";
 
 
           stringReplaceTask[taskId] = {

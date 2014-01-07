@@ -198,7 +198,7 @@ class {plugin-class-name}_Admin {
   }
 
   /**
-   * Outputs html for a <input> element corrsponding a setting.
+   * Outputs html for a <input> element corresponding a setting.
    * This function is called as a callback function for a setting.
    *
    * @param $args Array of values to customize <input> element
@@ -256,7 +256,7 @@ class {plugin-class-name}_Admin {
 
     foreach($options as $value => $label) {
       echo "<label>";
-      echo "<input class='regular-checkbox' type='radio'" . checked( $field, $value, false ) . "name='{plugin-slug}-settings[$field_name]' value='$value'/>";
+      echo "<input type='radio'" . checked( $field, $value, false ) . "name='{plugin-slug}-settings[$field_name]' value='$value'/>";
       echo " $label</label><br>";
     }
 
@@ -279,7 +279,7 @@ class {plugin-class-name}_Admin {
 
     foreach($options as $value => $label) {
       echo "<label>";
-      echo "<input class='regular-checkbox' type='checkbox'"
+      echo "<input type='checkbox'"
               . checked( $field[$value], 'on', false )
               . "name='abz-test-plugin-settings[$field_name][$value]' value='on'/>";
       echo " $label</label><br>";

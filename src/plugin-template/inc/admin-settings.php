@@ -201,7 +201,7 @@ class {plugin-class-name}_Admin {
    * Outputs html for a <input> element corrsponding a setting.
    * This function is called as a callback function for a setting.
    *
-   * @param $args Array of values tc customize <input> element
+   * @param $args Array of values to customize <input> element
    *  field_type: Value of type attribute of <input> element. Should be one of text, url, number, email
    *  field_name: Value used in name attribute of <input> element
    */
@@ -219,10 +219,9 @@ class {plugin-class-name}_Admin {
    * Outputs html for a <select> element corresponding a setting.
    * This function is called as a callback function for a setting.
    *
-   * @param $args Array of values tc customize <select> element
-   *  field_type: Value of type attribute of <select> element. Should be one of text, url, number, email
+   * @param $args Array of values to customize <select> element
    *  field_name: Value used in name attribute of <select> element
-   *  options: Associative array having value => label entries. Each array element woulb become an <option> element.
+   *  options: Associative array having value => label entries. Each array element would become an <option> element.
    */
   public function render_select_field($args) {
   
@@ -243,23 +242,47 @@ class {plugin-class-name}_Admin {
   }
 
   /**
-   * Outputs html for a <input type="checkbox/radio"> element corrsponding a setting.
+   * Outputs html for a <input type="radio"> element corrsponding a setting.
    * This function is called as a callback function for a setting.
    *
-   * @param $args Array of values tc customize <input> element
-   *  field_type: Value of type attribute of <input> element. Should be one of text, url, number, email
+   * @param $args Array of values to customize <input> element
    *  field_name: Value used in name attribute of <input> element
+   *  options: Associative array having value => label entries. Each array element would become a <radio> element.
    */
-  public function render_checkbox_or_radio_field($args) {
+  public function render_radio_field($args) {
     $field_name = $args['field_name'];
-    $field_type = $args['field_type'];
     $field = esc_attr($this->settings[$field_name]);
     $options = $args['options'];
 
     foreach($options as $value => $label) {
       echo "<label>";
-      echo "<input class='regular-checkbox' type='$field_type'" . checked( $field, $value, false ) . "name='{plugin-slug}-settings[$field_name]' value='$value'/>";
-      echo "</label> $label";
+      echo "<input class='regular-checkbox' type='radio'" . checked( $field, $value, false ) . "name='{plugin-slug}-settings[$field_name]' value='$value'/>";
+      echo " $label</label><br>";
+    }
+
+    $this->render_field_help_text( $args );
+  }
+
+  /**
+   * Outputs html for a <input type="checkbox"> element corrsponding a setting.
+   * Typically use this only for a checkbox group. A single on/off setting should use a 
+   * <select> or <input type="radio">.
+   * This function is called as a callback function for a setting.
+   *
+   * @param $args Array of values to customize <input> element
+   *  field_name: Value used in name attribute of <input> element
+   */
+  public function render_checkbox_field($args) {
+    $field_name = $args['field_name'];
+    $field = $this->settings[$field_name];
+    $options = $args['options'];
+
+    foreach($options as $value => $label) {
+      echo "<label>";
+      echo "<input class='regular-checkbox' type='checkbox'"
+              . checked( $field[$value], 'on', false )
+              . "name='abz-test-plugin-settings[$field_name][$value]' value='on'/>";
+      echo " $label</label><br>";
     }
 
     $this->render_field_help_text( $args );

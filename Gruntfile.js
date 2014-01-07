@@ -354,9 +354,13 @@ module.exports = function(grunt) {
               break;
 
             case "checkbox":
+              settingCallbackFunction = "render_checkbox_field";
+              settingFilenameSlug = "checkbox";
+              break;
+
             case "radio":
-              settingCallbackFunction = "render_checkbox_or_radio_field";
-              settingFilenameSlug = "checkbox-radio";
+              settingCallbackFunction = "render_radio_field";
+              settingFilenameSlug = "radio";
               break;
 
             default:

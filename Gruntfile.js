@@ -58,6 +58,7 @@ module.exports = function(grunt) {
         "plugin-desc": "",
         "plugin-uri": "",
         "settings": {},
+        "custom-posts": [],
         "options": {
           "settings-page": true,
           "widgets": []
@@ -308,6 +309,39 @@ module.exports = function(grunt) {
 
     } // end-for pageProp
   }
+
+
+  var customPosts = buildParams["custom-posts"];
+
+
+  if (customPosts && Object.keys(customPosts).length > 0) {
+    // Set preprocessor context variable so it is available for grunt-preprocess @ifdef
+    preprocessContext["CUSTOMPOSTS"] = true;
+
+    // found atleast one property in custom posts object
+    grunt.log.debug("found custom posts");
+
+    var customPostHandler = require("./grunt-modules/custom-post-handler.js");
+
+    customPosts.forEach(function(customPost) {
+      grunt.log.debug("custom post: " + customPost.name);
+
+      var customPostResult = customPostHandler.generate(grunt, customPost, buildParams, replacements, distdir);
+
+      grunt.log.debug("Adding tasks...");
+      taskUtils.populateCfgTasks( customPostResult.taskNameList,
+                                  cfg,
+                                  {
+                                    "string-replace": customPostResult["string-replace"],
+                                    "fileregexrename": customPostResult["fileregexrename"]
+                                  },
+                                  taskList,
+                                  grunt
+                                )
+
+      }); // end customPosts.forEach
+
+  } //end if customPosts
 
 
   grunt.initConfig(cfg);

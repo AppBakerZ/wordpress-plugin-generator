@@ -1,12 +1,14 @@
 <?php
 /**
- * Defines {plugin-custom-post}_Custom_Post custom post. This class contains functions for customizing 
+ * Defines {custom-post-class-name}_Custom_Post custom post. This class contains functions for customizing 
  * the add/edit page and posts list page.
+ *
+// @include ../../temp/header-comments.txt
  **/
 
-class {plugin-custom-post-class-name}_Custom_Post {
+class {custom-post-class-name}_Custom_Post {
 
-  const post_type = '{plugin-custom-post-slug}';
+  const post_type = '{custom-post-slug}';
   private static $prefix = '';
 
   /* Default values of post meta data to be used in metaboxes */
@@ -17,7 +19,7 @@ class {plugin-custom-post-class-name}_Custom_Post {
 
 
 
-  public function {plugin-custom-post-class-name}_Custom_Post() {
+  public function {custom-post-class-name}_Custom_Post() {
 
     $this::$prefix = {plugin-class-name}_Info::slug . "-" . $this::post_type;
 
@@ -49,19 +51,19 @@ class {plugin-custom-post-class-name}_Custom_Post {
   private function register_post_type() {
 
     $labels = array(
-      'name' => __('{plugin-custom-post-name}', '{plugin-slug}'),
-      'singular_name' => __('{plugin-custom-post-name-singular}', '{plugin-slug}'),
+      'name' => __('{custom-post-name}', '{plugin-slug}'),
+      'singular_name' => __('{custom-post-name-singular}', '{plugin-slug}'),
       'add_new' => __('Add New', '{plugin-slug}'),
-      'add_new_item' => __('Add New {plugin-custom-post-name-singular}', '{plugin-slug}'),
-      'edit_item' => __('Edit {plugin-custom-post-name-singular}', '{plugin-slug}'),
-      'new_item' => __('New  {plugin-custom-post-name-singular}', '{plugin-slug}'),
-      'view_item' => __('View {plugin-custom-post-name-singular}', '{plugin-slug}'),
-      'not_found' => __('No {plugin-custom-post-name-singular} found', '{plugin-slug}'),
-      'not_found_in_trash' => __('No {plugin-custom-post-name-singular} found in Trash', '{plugin-slug}'),
-      'all_items' => __('All {plugin-custom-post-name}', '{plugin-slug}'),
-      'search_items' => __('Search {plugin-custom-post-name}', '{plugin-slug}'),
+      'add_new_item' => __('Add New {custom-post-name-singular}', '{plugin-slug}'),
+      'edit_item' => __('Edit {custom-post-name-singular}', '{plugin-slug}'),
+      'new_item' => __('New {custom-post-name-singular}', '{plugin-slug}'),
+      'view_item' => __('View {custom-post-name-singular}', '{plugin-slug}'),
+      'not_found' => __('No {custom-post-name-singular} found', '{plugin-slug}'),
+      'not_found_in_trash' => __('No {custom-post-name-singular} found in Trash', '{plugin-slug}'),
+      'all_items' => __('All {custom-post-name}', '{plugin-slug}'),
+      'search_items' => __('Search {custom-post-name}', '{plugin-slug}'),
       'parent_item_colon' => false,
-      'menu_name' => __('{plugin-custom-post-name}', '{plugin-slug}')
+      'menu_name' => __('{custom-post-name}', '{plugin-slug}')
     );
 
     $args = array(
@@ -134,17 +136,17 @@ class {plugin-custom-post-class-name}_Custom_Post {
   private function register_taxonomy() {
 
     $labels = array(
-      'name'              => __('{plugin-custom-post-name-singular} Categories', '{plugin-slug}'),
-      'singular_name'     => __('{plugin-custom-post-name-singular} Category', '{plugin-slug}'),
-      'search_items'      => __('Search {plugin-custom-post-name-singular} Categories', '{plugin-slug}'),
-      'all_items'         => __('All {plugin-custom-post-name-singular} Categories', '{plugin-slug}'),
-      'parent_item'       => __('Parent {plugin-custom-post-name-singular} Category', '{plugin-slug}'),
-      'parent_item_colon' => __('Parent {plugin-custom-post-name-singular} Category:', '{plugin-slug}'),
-      'edit_item'         => __('Edit {plugin-custom-post-name-singular} Category', '{plugin-slug}'),
-      'update_item'       => __('Update {plugin-custom-post-name-singular} Category', '{plugin-slug}'),
-      'add_new_item'      => __('Add New {plugin-custom-post-name-singular} Category', '{plugin-slug}'),
-      'new_item_name'     => __('New {plugin-custom-post-name-singular} Category Name', '{plugin-slug}'),
-      'menu_name'         => __('{plugin-custom-post-name-singular} Categories', '{plugin-slug}'),
+      'name'              => __('{custom-post-name-singular} Categories', '{plugin-slug}'),
+      'singular_name'     => __('{custom-post-name-singular} Category', '{plugin-slug}'),
+      'search_items'      => __('Search {custom-post-name-singular} Categories', '{plugin-slug}'),
+      'all_items'         => __('All {custom-post-name-singular} Categories', '{plugin-slug}'),
+      'parent_item'       => __('Parent {custom-post-name-singular} Category', '{plugin-slug}'),
+      'parent_item_colon' => __('Parent {custom-post-name-singular} Category:', '{plugin-slug}'),
+      'edit_item'         => __('Edit {custom-post-name-singular} Category', '{plugin-slug}'),
+      'update_item'       => __('Update {custom-post-name-singular} Category', '{plugin-slug}'),
+      'add_new_item'      => __('Add New {custom-post-name-singular} Category', '{plugin-slug}'),
+      'new_item_name'     => __('New {custom-post-name-singular} Category Name', '{plugin-slug}'),
+      'menu_name'         => __('{custom-post-name-singular} Categories', '{plugin-slug}'),
     );
 
     $args = array(
@@ -153,11 +155,11 @@ class {plugin-custom-post-class-name}_Custom_Post {
       'show_ui' => true,
       'show_admin_column' => true,
       'query_var' => true,
-      'rewrite' => array('slug' => '{plugin-custom-post-name-singular} Category') // TODO: Kashif see rewrite, this should be same as wp settings
+      'rewrite' => array('slug' => '{custom-post-name-singular} Category') // TODO: Kashif see rewrite, this should be same as wp settings
     );
 
     //Register Taxonomy
-    register_taxonomy('{plugin-custom-post-name-singular} Category', array( $this::$post_type ), $args);
+    register_taxonomy('{custom-post-name-singular} Category', array( $this::$post_type ), $args);
   }
 
 
@@ -170,12 +172,12 @@ class {plugin-custom-post-class-name}_Custom_Post {
   private function register_script_and_style() {
 
     wp_register_script( $this::$prefix . '-script',
-                        {plugin-class-name}_Info::$plugin_url . '/assets/js/admin-{plugin-custom-post-slug}-custom-post.js',
+                        {plugin-class-name}_Info::$plugin_url . '/assets/js/admin-custom-post-{custom-post-slug}.js',
                         array( 'jquery' ),
                         {plugin-class-name}_Info::version );
 
     wp_register_style( $this::$prefix . '-style',
-                      {plugin-class-name}_Info::$plugin_url . '/assets/css/admin-{plugin-custom-post-slug}-custom-post.css',
+                      {plugin-class-name}_Info::$plugin_url . '/assets/css/admin-custom-post-{custom-post-slug}.css',
                       array(),
                       {plugin-class-name}_Info::version );
   }
@@ -222,7 +224,7 @@ class {plugin-custom-post-class-name}_Custom_Post {
    * */
   public function handle_save_post($post_id) {
 
-    $dbkey = '{plugin-custom-post-slug}';
+    $dbkey = '{custom-post-slug}';
 
     // Only handle the save of our custom post
     if ($this::post_type != $_POST['post_type']) {
@@ -243,15 +245,6 @@ class {plugin-custom-post-class-name}_Custom_Post {
   }
 
   /********************************** Metaboxes Related ******************************************/
-
-  /**
-  * Handles add_metabox_classes filter 
-  */
-  public function add_metabox_classes($classes){
-    // Add a common css class to all our meta boxes
-    array_push($classes, {plugin-slug}_Info::slug . '-metabox');
-    return $classes;
-  }
 
   /*
    * Handles add_meta_boxes action
@@ -285,48 +278,17 @@ class {plugin-custom-post-class-name}_Custom_Post {
     add_filter("postbox_classes_" . $this::$post_type . "_$markup_id", array($this, 'add_metabox_classes'));
   }
 
-  /*
-   * Renders Meta box on custom post add/edit page
-   **/
-  public function render_meta_box1() {
-    ?>
-
-    <!--Link to lightbox image Section-->
-    <div class="abz-tiles-row">
-      <div class="abz-tiles-left-panel">
-        <label for="abz-tiles-link-options"><?php printf(__('Link options', '{plugin-slug}')) ?></label>
-      </div>
-
-      <div class="abz-tiles-right-panel">
-        <input type="radio" name="abz-tiles-post-meta[link-options]"
-               id="abz-tiles-link-options-lightbox-image"
-               value="lightbox-image" <?php checked('lightbox-image', $this->post_meta_data['link-options']); ?> >
-        <label
-          for="abz-tiles-link-options-lightbox-image"><?php printf(__('Link to lightbox image', '{plugin-slug}')) ?></label>
-
-        <input type="radio" name="abz-tiles-post-meta[link-options]"
-               id="abz-tiles-link-options-custom-url"
-               value="custom-url" <?php checked('custom-url', $this->post_meta_data['link-options']); ?> >
-        <label for="abz-tiles-link-options-custom-url"><?php printf(__('Link to custom url', '{plugin-slug}')) ?></label>
-
-        <input type="radio" name="abz-tiles-post-meta[link-options]"
-               id="abz-tiles-link-options-lightbox-w-custom-content"
-               value="lightbox-w-custom-content" <?php checked('lightbox-w-custom-content', $this->post_meta_data['link-options']); ?> >
-        <label
-          for="abz-tiles-link-options-lightbox-w-custom-content"><?php printf(__('Link to lightbox with custom html content', '{plugin-slug}')) ?></label>
-
-      </div>
-
-    </div>
-
-
-  <?php
-
+  /**
+  * Handles add_metabox_classes filter 
+  */
+  public function add_metabox_classes($classes){
+    // Add a common css class to all our meta boxes
+    array_push($classes, {plugin-slug}_Info::slug . '-metabox');
+    return $classes;
   }
 
-  public function render_meta_box2() {
 
-  }
+// include ../../temp/{custom-post-slug}-metaboxes.inc
 
 }
 

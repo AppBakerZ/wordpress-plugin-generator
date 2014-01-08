@@ -23,7 +23,7 @@ exports.populateCfgTasks = function(taskNameList, cfgTasks, customTasks, taskLis
 
     if (!cfgTask || !customTask) continue;
 
-    grunt.log.writeln("Adding " + taskName + " " + customTask[taskName]);
+    grunt.log.debug("Adding " + taskName + " " + customTask[taskName]);
 
     cfgTask[taskName] = customTask[taskName];
     taskList.push(qualifiedTaskName);
@@ -32,3 +32,19 @@ exports.populateCfgTasks = function(taskNameList, cfgTasks, customTasks, taskLis
 
 
 };
+
+/*
+exports.g = function (files, destFile, preLines, postLines) {
+  var fs = require("fs");
+
+  var preLines = preLines || [],
+      postLines = postLines || [],
+
+      contents = (files.map(function(item){
+          return fs.readFileSync(item);
+        }) || []);
+
+  fs.writeFileSync(destFile, preLines.join("\r\n") + contents.join("\r\n"), postLines.join("\r\n"));
+
+}
+*/

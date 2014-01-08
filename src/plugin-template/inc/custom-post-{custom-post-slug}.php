@@ -263,8 +263,7 @@ class {custom-post-class-name}_Custom_Post {
     }
 
     // Add as many meta boxes as you need here
-    $this->add_meta_box('mb1', __('Meta Box 1', '{plugin-slug}'), 'render_meta_box1');
-    $this->add_meta_box('mb2', __('Meta Box 2', '{plugin-slug}'), 'render_meta_box2');
+// @include ../../temp/{custom-post-slug}-handle-add-meta-boxes.inc
 
   }
 
@@ -288,7 +287,7 @@ class {custom-post-class-name}_Custom_Post {
   }
 
 
-// include ../../temp/{custom-post-slug}-metaboxes.inc
+// @include ../../temp/{custom-post-slug}-metaboxes.inc
 
 }
 

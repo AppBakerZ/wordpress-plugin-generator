@@ -1,7 +1,7 @@
   /*
    * Renders Meta box on custom post add/edit page
    **/
-  public function render_{meta-box-function-name}() {
+  public function render_{meta-box-function-name}_metabox() {
     ?>
 
     <!--Link to lightbox image Section-->

@@ -1,19 +1,21 @@
 "use strict;"
 
 var namingHelper = require("./naming-helper.js"),
-    taskUtils    = require("./task-utils.js");
+    taskUtils    = require("./task-utils.js"),
+    fs    = require("fs");
 
 const WORKING_FOLDER_NAME = "custom-posts";
 
 
-exports.generate = function(grunt, post, buildParams, replacements, distdir) {
+exports.generate = function(grunt, post, buildParams, replacements, distdir, tempdir) {
 
   grunt.log.debug("post: " + post.name);
 
   var settingFiles = [],
       taskNameList = [],
       stringReplaceTask = {},
-      fileRenameTask = {};
+      fileRenameTask = {},
+      concatTask = {};
 
   var postSlug = post.slug || namingHelper.makeWpId(post.name);
 
@@ -25,13 +27,6 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir) {
     postClassName = namingHelper.makeValidClassName(postSlug);
   }
 
-
-  /*
-  if (sectionMethod.substr(sectionMethod.length-7) == "section") {
-    sectionMethod = sectionMethod.substr(0, sectionMethod.length-8);
-  }
-  */
-
   // we need new replacement object for every setting
   var postReplacements = replacements.map(function(item) { return item; } );
   postReplacements.push(taskUtils.makeReplacementObject("custom-post-class-name", postClassName));
@@ -39,8 +34,49 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir) {
   postReplacements.push(taskUtils.makeReplacementObject("custom-post-name", post.name));
   postReplacements.push(taskUtils.makeReplacementObject("custom-post-name-singular", post.nameSingular));
 
-  var taskId = postSlug;
+  var taskId = "";
+  var metaBoxes = [];
 
+  for (var metaboxProp in post.metaboxes) {
+    var mb = post.metaboxes[metaboxProp],
+        mbId = namingHelper.makeWpId(metaboxProp),
+        mbFuncName = namingHelper.makeWpFunctionName(metaboxProp),
+        taskId = postSlug + "-metabox-" + mbId,
+        filename = tempdir + WORKING_FOLDER_NAME + "/" + taskId + ".inc";
+
+    var metaboxReplacements = postReplacements.map(function(item) { return item; } );
+    metaboxReplacements.push(taskUtils.makeReplacementObject("meta-box-function-name", mbFuncName));
+
+    // add a new fileregexrename task for this metabox to generate custom-post-meta-box
+    var files = {};
+    files[filename] = "src/grunt-includes/custom-post-meta-box.php";
+
+    // Generate setting-section.txt for every section
+    stringReplaceTask[taskId] = {
+      options: {
+        replacements: metaboxReplacements
+      },
+      files: files
+    };
+
+    taskNameList.push("string-replace:" + taskId);
+    metaBoxes.push({
+        name: metaboxProp,
+        id: mbId,
+        funcName: mbFuncName
+      });
+
+  }
+
+  // concat all metaboxes to a single file
+  taskId = postSlug + "-metabox";
+  concatTask[taskId] = {
+      src : [tempdir + WORKING_FOLDER_NAME + "/" + taskId + "-*.inc"],
+      dest: tempdir + postSlug + "-metaboxes.inc"
+    };
+  taskNameList.push("concat:" + taskId);
+
+  taskId = postSlug;
   // add a new string-replace task for this custom post
   stringReplaceTask[postSlug] = {
     options: {
@@ -54,7 +90,7 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir) {
   };
   taskNameList.push("string-replace:" + taskId);
 
-  // add a new fileregexrename task for this widget
+  // add a new fileregexrename task for this custom post
   fileRenameTask[postSlug] = {
     options: {
       replacements: postReplacements
@@ -67,9 +103,15 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir) {
 
   return {
     taskNameList: taskNameList,
-    "string-replace": stringReplaceTask,
-    "fileregexrename": fileRenameTask,
-    settingFiles: settingFiles
+    settingFiles: settingFiles,
+    tasks: {
+      "string-replace": stringReplaceTask,
+      "fileregexrename": fileRenameTask,
+      "concat": concatTask
+    },
+    metaBoxes: metaBoxes,
+    postSlug: postSlug
+
   };
 
 };

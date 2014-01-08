@@ -129,7 +129,7 @@ module.exports = function(grunt) {
 	clean: [tempdir, distdirRoot + "temp2/", distdirRoot + buildParams["plugin-slug"], "dist/"],
 
   concat: {
-    "prod": {
+    "merge-section-functions": {
       src : [distdirRoot + "temp2/*-function.txt"],
       dest: tempdir + 'sections-functions.inc'
     }
@@ -311,7 +311,8 @@ module.exports = function(grunt) {
   }
 
 
-  var customPosts = buildParams["custom-posts"];
+  var customPosts = buildParams["custom-posts"],
+      customPostMetaBoxes = {};
 
 
   if (customPosts && Object.keys(customPosts).length > 0) {
@@ -324,22 +325,22 @@ module.exports = function(grunt) {
     var customPostHandler = require("./grunt-modules/custom-post-handler.js");
 
     customPosts.forEach(function(customPost) {
-      grunt.log.debug("custom post: " + customPost.name);
+        grunt.log.debug("custom post: " + customPost.name);
 
-      var customPostResult = customPostHandler.generate(grunt, customPost, buildParams, replacements, distdir);
+        var customPostResult = customPostHandler.generate(grunt, customPost, buildParams, replacements, distdir, tempdir);
 
-      grunt.log.debug("Adding tasks...");
-      taskUtils.populateCfgTasks( customPostResult.taskNameList,
-                                  cfg,
-                                  {
-                                    "string-replace": customPostResult["string-replace"],
-                                    "fileregexrename": customPostResult["fileregexrename"]
-                                  },
-                                  taskList,
-                                  grunt
-                                )
+        grunt.log.debug("Adding tasks...");
+        taskUtils.populateCfgTasks( customPostResult.taskNameList,
+                                    cfg,
+                                    customPostResult.tasks,
+                                    taskList,
+                                    grunt
+                                  )
+
+        customPostMetaBoxes[ customPostResult.postSlug ] = customPostResult.metaBoxes;
 
       }); // end customPosts.forEach
+
 
   } //end if customPosts
 
@@ -378,6 +379,21 @@ module.exports = function(grunt) {
 
     fs.writeFileSync(tempdir + "handle_admin_init.txt", codeLines.join("\r\n") + contents.join("\r\n"));
 
+
+    // generate the include file {custom-post-slug}-handle-add-meta-boxes.inc for custom post
+    for (var postSlug in customPostMetaBoxes) {
+      var metaBoxes = customPostMetaBoxes[postSlug];
+
+      fs.writeFileSync( tempdir + postSlug + "-handle-add-meta-boxes.inc",
+                        metaBoxes.map(function(mb){
+                            return "    $this->add_meta_box('"
+                                    + mb.id
+                                    + "', __('"+ mb.name +"', '{plugin-slug}'), "
+                                    + "'render_" + mb.funcName + "_metabox');";
+                          }).join("\r\n")
+                      );
+
+    }    
   });
  taskList.push("generate-settings-include-file");
 

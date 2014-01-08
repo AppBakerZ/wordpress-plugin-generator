@@ -27,12 +27,26 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir, tem
     postClassName = namingHelper.makeValidClassName(postSlug);
   }
 
+  var postSingularName = post["nameSingular"];
+  if (postSingularName) {
+    // TODO make sure that post class name is valid
+  }
+  else {
+    if (post.name[post.name.length-1] == "s") {
+      postSingularName = post.name.substr(0, post.name.length-1);
+    }
+    else {
+      postSingularName = post.name;
+    }    
+  }
+
+
   // we need new replacement object for every setting
   var postReplacements = replacements.map(function(item) { return item; } );
   postReplacements.push(taskUtils.makeReplacementObject("custom-post-class-name", postClassName));
   postReplacements.push(taskUtils.makeReplacementObject("custom-post-slug", postSlug));
   postReplacements.push(taskUtils.makeReplacementObject("custom-post-name", post.name));
-  postReplacements.push(taskUtils.makeReplacementObject("custom-post-name-singular", post.nameSingular));
+  postReplacements.push(taskUtils.makeReplacementObject("custom-post-name-singular", postSingularName));
 
   var taskId = "";
   var metaBoxes = [];
@@ -51,7 +65,7 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir, tem
     var files = {};
     files[filename] = "src/grunt-includes/custom-post-meta-box.php";
 
-    // Generate setting-section.txt for every section
+    // Generate custom-post-meta-box.php for every metabox
     stringReplaceTask[taskId] = {
       options: {
         replacements: metaboxReplacements
@@ -68,7 +82,9 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir, tem
 
   }
 
-  // concat all metaboxes to a single file
+  /*********************************************************************************************************
+  * concat all {custom-post-slug}-metabox-{mbId}.inc files to a single file {custom-post-slug}-metaboxes.inc
+  *********************************************************************************************************/
   taskId = postSlug + "-metabox";
   concatTask[taskId] = {
       src : [tempdir + WORKING_FOLDER_NAME + "/" + taskId + "-*.inc"],
@@ -76,6 +92,11 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir, tem
     };
   taskNameList.push("concat:" + taskId);
 
+
+
+  /******************************************************************
+  * tasks to generate php, css and js files for this custom post type
+  *******************************************************************/
   taskId = postSlug;
   // add a new string-replace task for this custom post
   stringReplaceTask[postSlug] = {

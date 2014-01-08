@@ -21,7 +21,7 @@ class {custom-post-class-name}_Custom_Post {
 
   public function {custom-post-class-name}_Custom_Post() {
 
-    $this::$prefix = {plugin-class-name}_Info::slug . "-" . $this::post_type;
+    self::$prefix = {plugin-class-name}_Info::slug . "-" . self::post_type;
 
     // constructor must be called from init
     $this->handle_init();
@@ -96,7 +96,7 @@ class {custom-post-class-name}_Custom_Post {
       /* (boolean or array) (optional) Triggers the handling of rewrites for this post type.
          To prevent rewrites, set to false.
          Default: true and use $post_type as slug */
-      'rewrite' => true, 
+      'rewrite' => false, // TODO: Kashif 
 
       /* (string or array) (optional) The string to use to build the read, edit and delete 
          capabilities. May be passed as an array to allow for alternative plurals when using this
@@ -121,11 +121,11 @@ class {custom-post-class-name}_Custom_Post {
       /* (array/boolean) (optional) An alias for calling add_post_type_support() directly. 
          As of 3.5, boolean false can be passed as value instead of an array to prevent default (title and editor) behavior.
          Default: title and editor */
-      'supports' => array('title', 'thumbnail';2),
+      'supports' => array('title', 'thumbnail')
     );
 
     //Register Post type
-    register_post_type( $this::post_type, $args);
+    register_post_type( self::post_type, $args);
 
   }
 
@@ -155,11 +155,11 @@ class {custom-post-class-name}_Custom_Post {
       'show_ui' => true,
       'show_admin_column' => true,
       'query_var' => true,
-      'rewrite' => array('slug' => '{custom-post-name-singular} Category') // TODO: Kashif see rewrite, this should be same as wp settings
+      'rewrite' => false //array('slug' => '{custom-post-name-singular} Category') // TODO: Kashif see rewrite, this should be same as wp settings
     );
 
     //Register Taxonomy
-    register_taxonomy('{custom-post-name-singular} Category', array( $this::$post_type ), $args);
+    register_taxonomy('{custom-post-name-singular} Category', array( self::post_type ), $args);
   }
 
 
@@ -171,12 +171,12 @@ class {custom-post-class-name}_Custom_Post {
    */
   private function register_script_and_style() {
 
-    wp_register_script( $this::$prefix . '-script',
+    wp_register_script( self::$prefix . '-script',
                         {plugin-class-name}_Info::$plugin_url . '/assets/js/admin-custom-post-{custom-post-slug}.js',
                         array( 'jquery' ),
                         {plugin-class-name}_Info::version );
 
-    wp_register_style( $this::$prefix . '-style',
+    wp_register_style( self::$prefix . '-style',
                       {plugin-class-name}_Info::$plugin_url . '/assets/css/admin-custom-post-{custom-post-slug}.css',
                       array(),
                       {plugin-class-name}_Info::version );
@@ -193,7 +193,7 @@ class {custom-post-class-name}_Custom_Post {
     }
 
     // check that post being editied is our custom post type
-    if ( $this::post_type !== $post->post_type ) {
+    if ( self::post_type !== $post->post_type ) {
       return;
     }
 
@@ -213,10 +213,10 @@ class {custom-post-class-name}_Custom_Post {
     */
 
     //Enqueue our custom javascript file
-    wp_enqueue_style($this::$prefix . '-style');
+    wp_enqueue_style(self::$prefix . '-style');
 
     //Enqueue our custom javascript file
-    wp_enqueue_script($this::$prefix . '-script');
+    wp_enqueue_script(self::$prefix . '-script');
   }
 
   /*
@@ -227,14 +227,14 @@ class {custom-post-class-name}_Custom_Post {
     $dbkey = '{custom-post-slug}';
 
     // Only handle the save of our custom post
-    if ($this::post_type != $_POST['post_type']) {
+    if (self::post_type != $_POST['post_type']) {
       return;
     }
 
     $saved = get_post_meta($post_id, $dbkey);
     $saved = $saved[0];
 
-    $changed = $_POST[ $this::post_type . '-post-meta'];
+    $changed = $_POST[ self::post_type . '-post-meta'];
 
     // Compare saved and changed 
     
@@ -253,10 +253,10 @@ class {custom-post-class-name}_Custom_Post {
 
     global $post;
 
-    $saved_post_meta_data = get_post_meta($post->ID, 'abz-tiles-data');
+    $saved_post_meta_data = get_post_meta($post->ID, '{plugin-slug}-data');
     $this->post_meta_data = $saved_post_meta_data[0];
 
-    foreach ($default_values as $key => $values) {
+    foreach (self::$default_values as $key => $values) {
       if (!isset($this->post_meta_data[$key])) {
         $this->post_meta_data[$key] = $default_values[$key];
       }
@@ -270,11 +270,11 @@ class {custom-post-class-name}_Custom_Post {
   private function add_meta_box($id, $title, $func_name) {
     $markup_id = {plugin-class-name}_Info::slug. "-" . $id;
 
-    add_meta_box($markup_id, $title, array($this, $func_name), $this::$post_type, 'normal');
+    add_meta_box($markup_id, $title, array($this, $func_name), self::post_type, 'normal');
 
     // To add a custom class to metabox: http://wordpress.stackexchange.com/questions/49773/how-to-add-a-class-to-meta-box
     // In general, the hook is postbox_classes_{$page}_{$meta_box_id}
-    add_filter("postbox_classes_" . $this::$post_type . "_$markup_id", array($this, 'add_metabox_classes'));
+    add_filter("postbox_classes_" . self::post_type . "_$markup_id", array($this, 'add_metabox_classes'));
   }
 
   /**
@@ -282,7 +282,7 @@ class {custom-post-class-name}_Custom_Post {
   */
   public function add_metabox_classes($classes){
     // Add a common css class to all our meta boxes
-    array_push($classes, {plugin-slug}_Info::slug . '-metabox');
+    array_push($classes, {plugin-class-name}_Info::slug . '-metabox');
     return $classes;
   }
 

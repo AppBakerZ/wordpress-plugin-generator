@@ -355,7 +355,7 @@ module.exports = function(grunt) {
 
   grunt.loadTasks("./grunt-modules/tasks/");
 
-  grunt.registerTask("generate-settings-include-file", "Generates temp2/handle_admin_init.txt to be included in plugin file", function() {
+  grunt.registerTask("generate-include-files", "Generates temp2/handle_admin_init.txt and handle-add-meta-boxes.inc to be included in plugin file", function() {
     var fs = require("fs");
 
     var spaces = "    ",
@@ -395,7 +395,7 @@ module.exports = function(grunt) {
 
     }    
   });
- taskList.push("generate-settings-include-file");
+  taskList.push("generate-include-files");
 
 
   grunt.registerTask("perform-final-tasks", "Copies empty index.php file to every folder", function() {

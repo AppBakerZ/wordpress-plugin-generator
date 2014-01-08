@@ -93,6 +93,33 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir, tem
   taskNameList.push("concat:" + taskId);
 
 
+  // add a new task to generate require snippet
+  files = {};
+  taskId = postSlug + "-require-custom-post";
+  filename = tempdir + WORKING_FOLDER_NAME + "/" + taskId + ".inc";
+  files[filename] = "src/grunt-includes/custom-post-require.php";
+
+  // Generate custom-post-meta-box.php for every metabox
+  stringReplaceTask[taskId] = {
+    options: {
+      replacements: postReplacements
+    },
+    files: files
+  };
+  taskNameList.push("string-replace:" + taskId);
+
+
+  /*********************************************************************************************************
+  * concat all {custom-post-slug}-metabox-{mbId}.inc files to a single file {custom-post-slug}-metaboxes.inc
+  *********************************************************************************************************/
+  taskId = postSlug + "-require-custom-post";
+  concatTask[taskId] = {
+      src : [tempdir + WORKING_FOLDER_NAME + "/*-require-custom-post.inc"],
+      dest: tempdir + "custom-post-require.inc"
+    };
+  taskNameList.push("concat:" + taskId);
+
+
 
   /******************************************************************
   * tasks to generate php, css and js files for this custom post type

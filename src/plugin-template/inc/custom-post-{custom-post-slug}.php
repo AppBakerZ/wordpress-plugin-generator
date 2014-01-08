@@ -6,7 +6,7 @@
 // @include ../../temp/header-comments.txt
  **/
 
-class {custom-post-class-name}_Custom_Post {
+class {plugin-class-name}_{custom-post-class-name}_Custom_Post {
 
   const post_type = '{custom-post-slug}';
   private static $prefix = '';
@@ -17,12 +17,12 @@ class {custom-post-class-name}_Custom_Post {
       'var2' => 'default-value-of-var-2',
     );
 
-
-
-  public function {custom-post-class-name}_Custom_Post() {
-
+  public static function init() {
     self::$prefix = {plugin-class-name}_Info::slug . "-" . self::post_type;
+  } 
 
+
+  public function {plugin-class-name}_{custom-post-class-name}_Custom_Post() {
     // constructor must be called from init
     $this->handle_init();
   }

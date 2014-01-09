@@ -119,7 +119,7 @@ module.exports = function(grunt) {
   }
 
   // don't copy widget/custom-post related files, these will be included in a separate files object
-	var phpSourceFiles = ["**/*.php", "!**/*{plugin-widget*.*", "!**/*-custom-post.*"];
+	var phpSourceFiles = ["**/*.php", "!**/*{plugin-widget*.*", "!**/custom-post-*.*"];
 
   // Grunt default task list
   var taskList = ["clean", "string-replace:prod",  "fileregexrename:prod"];
@@ -132,6 +132,10 @@ module.exports = function(grunt) {
     "merge-section-functions": {
       src : [distdirRoot + "temp2/*-function.txt"],
       dest: tempdir + 'sections-functions.inc'
+    },
+    "empty-custom-post-require-file": {
+      src : [distdirRoot + "*.ttt"],
+      dest: tempdir + 'custom-post-require.inc'
     }
   },
 

@@ -110,6 +110,7 @@ module.exports = function(grunt) {
 
 	var distdirRoot = "dist/",
       tempdir = distdirRoot + "temp/",
+      finalIncludesDir = tempdir + "final-includes/",
       distdir = distdirRoot + buildParams["plugin-slug"] + "/", // The path to package directory
       replacements = [];
 
@@ -349,7 +350,7 @@ module.exports = function(grunt) {
   // the file does not exusts although its include tag is inside @ifdef
   cfg.concat["merge-require-custom-post"] = {
       src : [tempdir + customPostHandler.WORKING_FOLDER_NAME + "/*-require-custom-post.inc"],
-      dest: tempdir + "custom-post-require.inc"
+      dest: finalIncludesDir + "custom-post-require.inc"
     };
   //taskList.push("concat:merge-require-custom-post");
 

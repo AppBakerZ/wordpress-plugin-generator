@@ -75,7 +75,7 @@ class {plugin-class-name}_Info {
       add_action( 'admin_menu', array('{plugin-class-name}_Info','handle_admin_menu') );
       // @endif
       // @ifdef CUSTOMPOSTS
-// @include ../temp/custom-post-require.inc
+// @include ../temp/final-includes/custom-post-require.inc
       // @endif
     }
     

@@ -39,7 +39,8 @@ function copyValueIfMissing(obj, key1, key2, extra){
 }
 
 var namingHelper = require("./grunt-modules/naming-helper.js"),
-    taskUtils    = require("./grunt-modules/task-utils.js");
+    taskUtils    = require("./grunt-modules/task-utils.js"),
+    customPostHandler = require("./grunt-modules/custom-post-handler.js");
 
 module.exports = function(grunt) {
 
@@ -132,10 +133,6 @@ module.exports = function(grunt) {
     "merge-section-functions": {
       src : [distdirRoot + "temp2/*-function.txt"],
       dest: tempdir + 'sections-functions.inc'
-    },
-    "empty-custom-post-require-file": {
-      src : [distdirRoot + "*.ttt"],
-      dest: tempdir + 'custom-post-require.inc'
     }
   },
 
@@ -326,7 +323,6 @@ module.exports = function(grunt) {
     // found atleast one property in custom posts object
     grunt.log.debug("found custom posts");
 
-    var customPostHandler = require("./grunt-modules/custom-post-handler.js");
 
     customPosts.forEach(function(customPost) {
         grunt.log.debug("custom post: " + customPost.name);
@@ -345,8 +341,17 @@ module.exports = function(grunt) {
 
       }); // end customPosts.forEach
 
-
   } //end if customPosts
+  /*********************************************************************************************************
+  * concat all {custom-post-slug}-require-custom-post.inc files to a single file custom-post-require.inc
+  *********************************************************************************************************/
+  // We need to generate custom-post-require.inc anyway because preprocess will keep throwing error if 
+  // the file does not exusts although its include tag is inside @ifdef
+  cfg.concat["merge-require-custom-post"] = {
+      src : [tempdir + customPostHandler.WORKING_FOLDER_NAME + "/*-require-custom-post.inc"],
+      dest: tempdir + "custom-post-require.inc"
+    };
+  //taskList.push("concat:merge-require-custom-post");
 
 
   grunt.initConfig(cfg);

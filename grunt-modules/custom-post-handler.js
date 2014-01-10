@@ -6,6 +6,7 @@ var namingHelper = require("./naming-helper.js"),
 
 const WORKING_FOLDER_NAME = "custom-posts";
 
+exports.WORKING_FOLDER_NAME = WORKING_FOLDER_NAME;
 
 exports.generate = function(grunt, post, buildParams, replacements, distdir, tempdir) {
 
@@ -93,7 +94,9 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir, tem
   taskNameList.push("concat:" + taskId);
 
 
-  // add a new task to generate require snippet
+  /******************************************************************************
+  * generate {custom-post-slug}-require-custom-post.inc filefor this custom post
+  *******************************************************************************/
   files = {};
   taskId = postSlug + "-require-custom-post";
   filename = tempdir + WORKING_FOLDER_NAME + "/" + taskId + ".inc";
@@ -107,18 +110,6 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir, tem
     files: files
   };
   taskNameList.push("string-replace:" + taskId);
-
-
-  /*********************************************************************************************************
-  * concat all {custom-post-slug}-metabox-{mbId}.inc files to a single file {custom-post-slug}-metaboxes.inc
-  *********************************************************************************************************/
-  taskId = postSlug + "-require-custom-post";
-  concatTask[taskId] = {
-      src : [tempdir + WORKING_FOLDER_NAME + "/*-require-custom-post.inc"],
-      dest: tempdir + "custom-post-require.inc"
-    };
-  taskNameList.push("concat:" + taskId);
-
 
 
   /******************************************************************

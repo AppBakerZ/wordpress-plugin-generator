@@ -352,7 +352,7 @@ module.exports = function(grunt) {
       src : [tempdir + customPostHandler.WORKING_FOLDER_NAME + "/*-require-custom-post.inc"],
       dest: finalIncludesDir + "custom-post-require.inc"
     };
-  //taskList.push("concat:merge-require-custom-post");
+  taskList.push("concat:merge-require-custom-post");
 
 
   grunt.initConfig(cfg);
@@ -449,7 +449,7 @@ module.exports = function(grunt) {
   });
 
 	// Default task(s).
-  taskList.push("concat");
+  taskList.push("concat:merge-section-functions");
   taskList.push("preprocess");
   taskList.push("perform-final-tasks");
 

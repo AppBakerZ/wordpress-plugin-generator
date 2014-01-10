@@ -6,7 +6,8 @@
 // @include ../../temp/header-comments.txt
  **/
 
-class {plugin-class-name}_{custom-post-class-name}_Custom_Post {
+class {plugin-class-name}_{custom-post-class-name}_Custom_Post 
+      extends {plugin-class-name}_Custom_Post_Base {
 
   const post_type = '{custom-post-slug}';
   private static $prefix = '';
@@ -23,6 +24,7 @@ class {plugin-class-name}_{custom-post-class-name}_Custom_Post {
 
 
   public function {plugin-class-name}_{custom-post-class-name}_Custom_Post() {
+    $this->post_type = '{custom-post-slug}';
     // constructor must be called from init
     $this->handle_init();
   }
@@ -266,26 +268,6 @@ class {plugin-class-name}_{custom-post-class-name}_Custom_Post {
 // @include ../../temp/{custom-post-slug}-handle-add-meta-boxes.inc
 
   }
-
-  private function add_meta_box($id, $title, $func_name) {
-    $markup_id = {plugin-class-name}_Info::slug. "-" . $id;
-
-    add_meta_box($markup_id, $title, array($this, $func_name), self::post_type, 'normal');
-
-    // To add a custom class to metabox: http://wordpress.stackexchange.com/questions/49773/how-to-add-a-class-to-meta-box
-    // In general, the hook is postbox_classes_{$page}_{$meta_box_id}
-    add_filter("postbox_classes_" . self::post_type . "_$markup_id", array($this, 'add_metabox_classes'));
-  }
-
-  /**
-  * Handles add_metabox_classes filter 
-  */
-  public function add_metabox_classes($classes){
-    // Add a common css class to all our meta boxes
-    array_push($classes, {plugin-class-name}_Info::slug . '-metabox');
-    return $classes;
-  }
-
 
 // @include ../../temp/{custom-post-slug}-metaboxes.inc
 

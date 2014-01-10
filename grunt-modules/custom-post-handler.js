@@ -12,6 +12,8 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir, tem
 
   grunt.log.debug("post: " + post.name);
 
+  var customPostDir = tempdir + WORKING_FOLDER_NAME + "/";
+
   var settingFiles = [],
       taskNameList = [],
       stringReplaceTask = {},
@@ -57,12 +59,13 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir, tem
         mbId = namingHelper.makeWpId(metaboxProp),
         mbFuncName = namingHelper.makeWpFunctionName(metaboxProp),
         taskId = postSlug + "-metabox-" + mbId,
-        filename = tempdir + WORKING_FOLDER_NAME + "/" + taskId + ".inc";
+        filename = customPostDir + taskId + ".inc";
 
     var metaboxReplacements = postReplacements.map(function(item) { return item; } );
+    metaboxReplacements.push(taskUtils.makeReplacementObject("meta-box-slug", mbId));
     metaboxReplacements.push(taskUtils.makeReplacementObject("meta-box-function-name", mbFuncName));
 
-    // add a new fileregexrename task for this metabox to generate custom-post-meta-box
+    // add a new stringreplace task for this metabox to generate custom-post-meta-box
     var files = {};
     files[filename] = "src/grunt-includes/custom-post-meta-box.php";
 
@@ -81,6 +84,56 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir, tem
         funcName: mbFuncName
       });
 
+
+
+    var fieldFiles = [];
+    for (var settingName in mb) {
+
+      var setting = mb[settingName];
+
+      // we need new replacement object for every setting
+      var settingReplacements = metaboxReplacements.map(function(item) { return item; } );
+
+      var settingResult = taskUtils.processSingleField(settingName, setting, settingReplacements);
+
+      taskId = postSlug + "-mbfield-" + mbId + "-" + settingResult.settingId;
+      filename = customPostDir + taskId + ".inc";
+
+      grunt.log.writeln("settingFilenameSlug: " + settingResult.settingFilenameSlug);
+      files = {};
+      files[filename] = "src/grunt-includes/custom-post-metabox-" + settingResult.settingFilenameSlug + "-field.inc";
+
+
+      stringReplaceTask[taskId] = {
+        options: {
+          replacements: settingReplacements
+        },
+        files: files
+      };
+
+      // add string-replace task in default task list for this setting
+      taskNameList.push("string-replace:" + taskId);
+
+      fieldFiles.push( filename );
+
+    }
+
+  /*********************************************************************************************************
+  * concat all {postSlug}-mbfield-{mbId}-{settingId}.inc files to a single file {custom-post-slug}-metaboxes.inc
+  *********************************************************************************************************/
+    //files = {};
+    //filename = customPostDir + postSlug + "-" + mbId + "-fields.inc"; 
+    //files[filename] = customPostDir + postSlug + "-" + mbId + "-*-field.inc";
+
+    taskId = "merge-" + postSlug + "-" + mbId + "-fields";
+    // Generate custom-post-meta-box.php for every metabox
+    concatTask[taskId] = {
+      src : fieldFiles,
+      dest: customPostDir + postSlug + "-" + mbId + "-fields.inc"
+    };
+    taskNameList.push("concat:" + taskId);
+
+
   }
 
   /*********************************************************************************************************
@@ -88,7 +141,7 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir, tem
   *********************************************************************************************************/
   taskId = postSlug + "-metabox";
   concatTask[taskId] = {
-      src : [tempdir + WORKING_FOLDER_NAME + "/" + taskId + "-*.inc"],
+      src : [customPostDir + taskId + "-*.inc"],
       dest: tempdir + postSlug + "-metaboxes.inc"
     };
   taskNameList.push("concat:" + taskId);
@@ -99,7 +152,7 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir, tem
   *******************************************************************************/
   files = {};
   taskId = postSlug + "-require-custom-post";
-  filename = tempdir + WORKING_FOLDER_NAME + "/" + taskId + ".inc";
+  filename = customPostDir + "/" + taskId + ".inc";
   files[filename] = "src/grunt-includes/custom-post-require.php";
 
   // Generate custom-post-meta-box.php for every metabox

@@ -11,7 +11,48 @@
   "plugin-desc": "",
   "plugin-uri": "",
 
-  
+  "custom-posts": [{
+      "name": "Books",
+      "nameSingular": "book",
+      "metaboxes": {
+        "Details": { 
+            "Publisher": "text",
+            "ISBN": "text"
+          },
+        "Author": { 
+            "prop3": {
+                "type": "select",
+                "options": {
+                  "op1": "First Option" ,
+                  "op2": "Second Option",
+                  "op3": "Third Option"
+                }
+              }
+        } 
+      }
+    },
+    {
+      "name": "Newspapers",
+      "nameSingular": "Newspaper",
+      "metaboxes": {
+        "General Config": { 
+            "Publisher": "text",
+            "Since": "text"
+          },
+        "Special Config": { 
+            "prop3": {
+                "type": "select",
+                "options": {
+                  "op1": "First Option" ,
+                  "op2": "Second Option",
+                  "op3": "Third Option"
+                }
+              }
+        } 
+      }
+    }
+  ],
+
   "settings": {
       "page1" : {
         "Required" : {
@@ -21,17 +62,13 @@
         "Optional" : {
           "field 3": {
             "type": "select",
-            "items": {
+            "options": {
                 "ask": "Always Ask",
                 "allow": "Always Allow",
                 "deny": "Never Allow",
               }
             },
           "field 4": ""
-        },
-        "Global" : {
-          "field 5": "",
-          "field 6": ""
         }
       }
     },  

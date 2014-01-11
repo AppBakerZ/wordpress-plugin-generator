@@ -9,22 +9,18 @@
 class {plugin-class-name}_{custom-post-class-name}_Custom_Post 
       extends {plugin-class-name}_Custom_Post_Base {
 
-  const post_type = '{custom-post-slug}';
-  private static $prefix = '';
-
   /* Default values of post meta data to be used in metaboxes */
+  // TODO: Default values for variables must be initialized
   private static $default_values = array(
       'var1' => 'default-value-of-var-1',
       'var2' => 'default-value-of-var-2',
     );
 
-  public static function init() {
-    self::$prefix = {plugin-class-name}_Info::slug . "-" . self::post_type;
-  } 
-
-
   public function {plugin-class-name}_{custom-post-class-name}_Custom_Post() {
+    parent::__construct();
     $this->post_type = '{custom-post-slug}';
+    $this->prefix = {plugin-class-name}_Info::slug . "-" . $this->post_type;
+
     // constructor must be called from init
     $this->handle_init();
   }
@@ -38,12 +34,6 @@ class {plugin-class-name}_{custom-post-class-name}_Custom_Post
 
     //Add hook for admin admin style sheet and javascript.
     add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles_and_scripts'));
-
-    //Add hook for handling save post action
-    add_action('save_post', array($this, 'handle_save_post'));
-
-    //Add hook for adding meta box
-    add_action('add_meta_boxes', array($this, 'handle_add_meta_boxes'));
 
   }
 
@@ -127,7 +117,7 @@ class {plugin-class-name}_{custom-post-class-name}_Custom_Post
     );
 
     //Register Post type
-    register_post_type( self::post_type, $args);
+    register_post_type( $this->post_type, $args);
 
   }
 
@@ -161,7 +151,7 @@ class {plugin-class-name}_{custom-post-class-name}_Custom_Post
     );
 
     //Register Taxonomy
-    register_taxonomy('{custom-post-name-singular} Category', array( self::post_type ), $args);
+    register_taxonomy('{custom-post-name-singular} Category', array( $this->post_type ), $args);
   }
 
 
@@ -173,12 +163,12 @@ class {plugin-class-name}_{custom-post-class-name}_Custom_Post
    */
   private function register_script_and_style() {
 
-    wp_register_script( self::$prefix . '-script',
+    wp_register_script( $this->prefix . '-script',
                         {plugin-class-name}_Info::$plugin_url . '/assets/js/admin-custom-post-{custom-post-slug}.js',
                         array( 'jquery' ),
                         {plugin-class-name}_Info::version );
 
-    wp_register_style( self::$prefix . '-style',
+    wp_register_style( $this->prefix . '-style',
                       {plugin-class-name}_Info::$plugin_url . '/assets/css/admin-custom-post-{custom-post-slug}.css',
                       array(),
                       {plugin-class-name}_Info::version );
@@ -195,7 +185,7 @@ class {plugin-class-name}_{custom-post-class-name}_Custom_Post
     }
 
     // check that post being editied is our custom post type
-    if ( self::post_type !== $post->post_type ) {
+    if ( $this->post_type !== $post->post_type ) {
       return;
     }
 
@@ -215,60 +205,42 @@ class {plugin-class-name}_{custom-post-class-name}_Custom_Post
     */
 
     //Enqueue our custom javascript file
-    wp_enqueue_style(self::$prefix . '-style');
+    wp_enqueue_style($this->prefix . '-style');
 
     //Enqueue our custom javascript file
-    wp_enqueue_script(self::$prefix . '-script');
+    wp_enqueue_script($this->prefix . '-script');
   }
 
+  /***************************** Override Template Pattern Functions *********************************/
+
+  protected function get_default_values() {
+    // TODO: template - raise exception to enforce override
+    return self::$default_values;
+  }
+
+  /**
+   * Child classes must override filter_post_data_on_save to save and sanatize post meta data 
+   * 
+   * @param original Associative array of meta data values from database
+   * @param changed Associative array of meta data values submitted by user
+   * 
+   * @return void
+   **/
+  protected function filter_post_data_on_save($original, $changed) {
+    // TODO: template - raise exception to enforce override    
+    return $changed;
+  }
+
+
   /*
-   * Check the custom post data before saving to database
+   * Called by add_meta_boxes handler of base class
    * */
-  public function handle_save_post($post_id) {
-
-    $dbkey = '{custom-post-slug}';
-
-    // Only handle the save of our custom post
-    if (self::post_type != $_POST['post_type']) {
-      return;
-    }
-
-    $saved = get_post_meta($post_id, $dbkey);
-    $saved = $saved[0];
-
-    $changed = $_POST[ self::post_type . '-post-meta'];
-
-    // Compare saved and changed 
-    
-
-    // Add or update data in DB
-    add_post_meta($post_id, $dbkey, $changed, true)
-    || update_post_meta($post_id, $dbkey, $changed);
+  protected function add_meta_boxes() {
+    // Add as many meta boxes as you need here
+// @include ../../temp/{custom-post-slug}-handle-add-meta-boxes.inc
   }
 
   /********************************** Metaboxes Related ******************************************/
-
-  /*
-   * Handles add_meta_boxes action
-   * */
-  public function handle_add_meta_boxes() {
-
-    global $post;
-
-    $saved_post_meta_data = get_post_meta($post->ID, '{plugin-slug}-data');
-    $this->post_meta_data = $saved_post_meta_data[0];
-
-    foreach (self::$default_values as $key => $values) {
-      if (!isset($this->post_meta_data[$key])) {
-        $this->post_meta_data[$key] = $default_values[$key];
-      }
-    }
-
-    // Add as many meta boxes as you need here
-// @include ../../temp/{custom-post-slug}-handle-add-meta-boxes.inc
-
-  }
-
 // @include ../../temp/{custom-post-slug}-metaboxes.inc
 
 }

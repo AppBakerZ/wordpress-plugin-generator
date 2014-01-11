@@ -11,13 +11,40 @@ class {plugin-class-name}_Custom_Post_Base {
    * custom post slug. To be initialized by child class
    */
   protected $post_type = '';
+  protected $prefix = '';
 
   public function {plugin-class-name}_Custom_Post_Base() {
     // constructor must be called from init
+
+    //Add hook for handling save post action
+    add_action('save_post', array($this, 'handle_save_post_base'));
+
+    //Add hook for adding meta box
+    add_action('add_meta_boxes', array($this, 'handle_add_meta_boxes_base'));
+
   }
 
+  /*
+   * Handles add_meta_boxes action
+   * */
+  public function handle_add_meta_boxes_base() {
 
-  /********************************** Metaboxes Related ******************************************/
+    global $post;
+
+    $saved_post_meta_data = get_post_meta($post->ID, $this->prefix);
+    $this->post_meta_data = $saved_post_meta_data[0];
+
+    $default_values = $this->get_default_values();
+    foreach ($default_values as $key => $values) {
+      if (!isset($this->post_meta_data[$key])) {
+        $this->post_meta_data[$key] = $default_values[$key];
+      }
+    }
+
+    // delegate to child class 
+    $this->add_meta_boxes();
+
+  }
 
   protected function add_meta_box($id, $title, $func_name) {
     $markup_id = {plugin-class-name}_Info::slug. "-" . $id;
@@ -38,6 +65,60 @@ class {plugin-class-name}_Custom_Post_Base {
     return $classes;
   }
 
+  /*
+   * Check the custom post data before saving to database
+   * */
+  public function handle_save_post_base($post_id) {
+
+    // Only handle the save of our custom post
+    if ($this->post_type != $_POST['post_type']) {
+      return;
+    }
+
+    $saved = get_post_meta($post_id, $this->prefix);
+    $saved = $saved[0];
+
+    $changed = $_POST[ $this->prefix ];
+
+    // Compare saved and changed 
+    // Call the subclass function to filter and return $changed
+    $changed = $this->filter_post_data_on_save($original, $changed); 
+
+    // Add or update data in DB
+    add_post_meta($post_id, $this->prefix, $changed, true)
+    || update_post_meta($post_id, $this->prefix, $changed);
+  }
+
+
+  /******************************** Template Pattern Functions ************************************/
+
+  protected function get_default_values() {
+    // TODO: template - raise exception to enforce override
+    return array();
+  }
+
+  /**
+   * Child classes must override add_meta_boxes to add metaboxes 
+   * @return void
+   **/
+  protected function add_meta_boxes() {
+    // TODO: template - raise exception to enforce override
+  }
+
+  /**
+   * Child classes must override filter_post_data_on_save to save and sanatize post meta data 
+   * 
+   * @param original Associative array of meta data values from database
+   * @param changed Associative array of meta data values submitted by user
+   * 
+   * @return void
+   **/
+  protected function filter_post_data_on_save($original, $changed) {
+    // TODO: template - raise exception to enforce override    
+    return $changed;
+  }
+
+  /******************************** Metaboxes Fields helpers **************************************/
 
   protected function render_template_pre_field($setting_id, $localized_name) {
     ?>
@@ -66,7 +147,7 @@ class {plugin-class-name}_Custom_Post_Base {
   protected function render_input_field($setting_id, $localized_name, $setting_type="text") {
       $this->render_template_pre_field($setting_id, $localized_name);
     ?>
-        <input type="<?php echo $setting_type;?> name="{plugin-slug}-{custom-post-slug}[<?php echo $setting_id;?>]"
+        <input type="<?php echo $setting_type;?>" name="{plugin-slug}-{custom-post-slug}[<?php echo $setting_id;?>]"
                id="{plugin-slug}-{custom-post-slug}-<?php echo $setting_id;?>"
                value="<?php echo $this->post_meta_data[$setting_id]; ?>"> 
 

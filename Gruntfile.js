@@ -128,6 +128,8 @@ module.exports = function(grunt) {
 	// Grunt project configuration.
   var cfg = {
 
+  array2file: {},
+
 	clean: [tempdir, distdirRoot + "temp2/", distdirRoot + buildParams["plugin-slug"], "dist/"],
 
   concat: {
@@ -146,8 +148,8 @@ module.exports = function(grunt) {
       files: [
         // Note that .php/.css files are copied as .php.js/.css.js. This is to hack preprocess to think .php.js file as js files
         {expand: true, cwd: "src/plugin-template", src : phpSourceFiles,  dest: distdir, ext: ".php.js" },
-        {expand: true, cwd: "src/plugin-template", src : ["**/*.css", "!**/*plugin-widget*.css"],  dest: distdir, ext: ".css.js" },
-        {expand: true, cwd: "src/plugin-template", src : ["**/*.*", "!**/*.css", "!**/*.php", "!**/*plugin-widget*.*", "!**/*-custom-post.*"],  dest: distdir },
+        {expand: true, cwd: "src/plugin-template", src : ["**/*.css", "!**/*plugin-widget*.css","!**/*custom-post*.css"],  dest: distdir, ext: ".css.js" },
+        {expand: true, cwd: "src/plugin-template", src : ["**/*.*", "!**/*.css", "!**/*.php", "!**/*plugin-widget*.*", "!**/*custom-post*.*"],  dest: distdir },
         {expand: true, cwd: "src/grunt-includes", src : ["**/*.*"],  dest: tempdir }
         ]
     },
@@ -353,7 +355,6 @@ module.exports = function(grunt) {
       dest: finalIncludesDir + "custom-post-require.inc"
     };
   taskList.push("concat:merge-require-custom-post");
-
 
   grunt.initConfig(cfg);
 

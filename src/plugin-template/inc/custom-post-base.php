@@ -13,6 +13,10 @@ class {plugin-class-name}_Custom_Post_Base {
   protected $post_type = '';
   protected $prefix = '';
 
+  private static $styles_registered = false;
+  protected static $styles = array('{plugin-slug}-custom-post-base');
+  protected static $scripts = array();
+
   public function {plugin-class-name}_Custom_Post_Base() {
     // constructor must be called from init
 
@@ -90,6 +94,20 @@ class {plugin-class-name}_Custom_Post_Base {
   }
 
 
+  protected function register_script_and_style_base() {
+    // Base scripts and styles must be registered only once
+    if (self::$styles_registered) {
+      return;
+    }
+
+    self::$styles_registered = true;
+
+    wp_register_style( self::$styles[0],
+      {plugin-class-name}_Info::$plugin_url . '/assets/css/admin-custom-post-base.css',
+      array( ),
+      {plugin-class-name}_Info::version );
+  }
+
   /******************************** Template Pattern Functions ************************************/
 
   protected function get_default_values() {
@@ -124,7 +142,7 @@ class {plugin-class-name}_Custom_Post_Base {
     ?>
     <div class="{plugin-slug}-row">
       <div class="{plugin-slug}-left-panel">
-        <label for="{plugin-slug}-{custom-post-slug}-<?php echo $setting_id;?>"><?php echo $localized_name;?></label>
+        <label for="<?php echo $this->prefix . '-' . $setting_id;?>"><?php echo $localized_name;?></label>
       </div>
 
       <div class="{plugin-slug}-right-panel">
@@ -141,14 +159,36 @@ class {plugin-class-name}_Custom_Post_Base {
 
   /**
    * Outputs html for a <input> element corresponding a setting.
-   *
-   * @param $setting_type: Value of type attribute of <input> element. Should be one of text, url, number, email
+   * @param $setting_id
+   * @param $localized_name
+   * @param string $setting_type Value of type attribute of <input> element. Should be one of text, url, number, email.
+   * @param array $classes Css classnames that should be added to input field. Use null for default classes.
+   * @param array $attributes html attributes that should be added to input field. Use null for default classes.
    */
-  protected function render_input_field($setting_id, $localized_name, $setting_type="text") {
+  protected function render_input_field($setting_id, $localized_name, $setting_type="text", $classes=array("large-text"), $attributes = array()) {
+      if ($classes === null) {
+        $classes = array("large-text");
+      }
+      if ($attributes === null) {
+        $attributes = array();
+      }
       $this->render_template_pre_field($setting_id, $localized_name);
     ?>
-        <input type="<?php echo $setting_type;?>" name="{plugin-slug}-{custom-post-slug}[<?php echo $setting_id;?>]"
-               id="{plugin-slug}-{custom-post-slug}-<?php echo $setting_id;?>"
+        <input type="<?php echo $setting_type;?>" name="<?php echo $this->prefix . '[' . $setting_id . ']';?>"
+              <?php
+                foreach($attributes as $key => $value){
+                  error_log("key-val:  $key => $value " . is_bool($value));
+                  if (is_bool($value)) {
+                    if ($value) {
+                      echo $key . " ";
+                    }
+                  }
+                  else {
+                    echo "$key=\"$value\" ";
+                  }
+                }
+              ?>
+               id="<?php echo $this->prefix . '-' . $setting_id;?>" class="<?php echo implode(" ", $classes) ;?>"
                value="<?php echo $this->post_meta_data[$setting_id]; ?>"> 
 
 
@@ -165,9 +205,8 @@ class {plugin-class-name}_Custom_Post_Base {
     $saved_value = $this->post_meta_data[$setting_id];
     $this->render_template_pre_field($setting_id, $localized_name);
     ?>
-      <div class="{plugin-slug}-right-panel">
-        <select name="{plugin-slug}-{custom-post-slug}[<?php echo $setting_id;?>]"
-                id="{plugin-slug}-{custom-post-slug}-<?php echo $setting_id;?>"> 
+        <select name="<?php echo $this->prefix . '[' . $setting_id . ']';?>"
+                id="<?php echo $this->prefix . '-' . $setting_id;?>"> 
           <?php                
           foreach($options as $value => $label) {
             echo "<option " . selected($saved_value, $value, false) . " value='$value'>$label</option>";
@@ -190,16 +229,15 @@ class {plugin-class-name}_Custom_Post_Base {
   protected function render_radio_field($setting_id, $localized_name, $options=array()) {
     $saved_value = $this->post_meta_data[$setting_id];
     $this->render_template_pre_field($setting_id, $localized_name);
-    ?>
 
     foreach($options as $value => $label) {
       echo "<label>";
-      echo "<input type='radio'" . checked( $field, $value, false ) . "name='{plugin-slug}-settings[$field_name]' value='$value'/>";
+      echo '<input type="radio"' . checked( $saved_value, $value, false ) 
+                . 'name="' . $this->prefix . '[' . $setting_id . ']" value="' . $value . '"/>';
       echo " $label</label><br>";
     }
 
-    <?php
-      $this->render_template_post_field();
+    $this->render_template_post_field();
   }
 
   /**
@@ -212,18 +250,16 @@ class {plugin-class-name}_Custom_Post_Base {
   protected function render_checkbox_field($setting_id, $localized_name, $options=array()) {
     $saved_value = $this->post_meta_data[$setting_id];
     $this->render_template_pre_field($setting_id, $localized_name);
-    ?>
 
     foreach($options as $value => $label) {
       echo "<label>";
-      echo "<input type='checkbox'"
-              . checked( $field[$value], 'on', false )
-              . "name='abz-test-plugin-settings[$field_name][$value]' value='on'/>";
+      echo '<input type="checkbox"'
+              . checked( $saved_value[$value], 'on', false )
+              . 'name="' . $this->prefix . "[$setting_id][$value]" . '" value="on"/>';
       echo " $label</label><br>";
     }
 
-    <?php
-      $this->render_template_post_field();
+    $this->render_template_post_field();
   }
 
 

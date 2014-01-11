@@ -1,0 +1,48 @@
+/**
+ * Common admin stylesheet for custom posts of {plugin-name} plugin.
+ *
+// @include ../../../temp/header-comments.txt
+ */
+
+/* class gets applied to every metabox that the plugin creates */
+.{plugin-slug}-metabox {
+
+}
+
+.{plugin-slug}-row {
+    padding: 6px 0; /*.inside class has margin-top:6px*/
+}
+
+.{plugin-slug}-row:not(:last-of-type) {
+    border-bottom: 1px solid #ECECEC;
+}
+
+.{plugin-slug}-row:first-of-type {
+    padding-top: 0;
+}
+
+.{plugin-slug}-row:last-of-type {
+    padding-bottom: 0;
+}
+
+
+.{plugin-slug}-row > .{plugin-slug}-left-panel,
+.{plugin-slug}-row > .{plugin-slug}-right-panel {
+  position:relative;
+  display: inline-block;
+  -o-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  margin-left:1%;
+}
+
+
+.{plugin-slug}-row > .{plugin-slug}-left-panel {
+  width:24%;
+  vertical-align: top;
+}
+
+.{plugin-slug}-row > .{plugin-slug}-right-panel {
+  width:73%;
+}

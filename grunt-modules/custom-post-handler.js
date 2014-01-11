@@ -14,8 +14,7 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir, tem
 
   var customPostDir = tempdir + WORKING_FOLDER_NAME + "/";
 
-  var settingFiles = [],
-      taskNameList = [],
+  var taskNameList = [],
       stringReplaceTask = {},
       fileRenameTask = {},
       concatTask = {};
@@ -51,22 +50,25 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir, tem
   postReplacements.push(taskUtils.makeReplacementObject("custom-post-name", post.name));
   postReplacements.push(taskUtils.makeReplacementObject("custom-post-name-singular", postSingularName));
 
-  var taskId = "";
-  var metaBoxes = [];
+  var taskId = "",
+      metaBoxes = []
+      settingDefaults = [];
 
   for (var metaboxProp in post.metaboxes) {
     var mb = post.metaboxes[metaboxProp],
         mbId = namingHelper.makeWpId(metaboxProp),
-        mbFuncName = namingHelper.makeWpFunctionName(metaboxProp),
-        taskId = postSlug + "-metabox-" + mbId,
-        filename = customPostDir + taskId + ".inc";
+        mbFuncName = namingHelper.makeWpFunctionName(metaboxProp);
+
+    var files, taskId, filename;
 
     var metaboxReplacements = postReplacements.map(function(item) { return item; } );
     metaboxReplacements.push(taskUtils.makeReplacementObject("meta-box-slug", mbId));
     metaboxReplacements.push(taskUtils.makeReplacementObject("meta-box-function-name", mbFuncName));
 
     // add a new stringreplace task for this metabox to generate custom-post-meta-box
-    var files = {};
+    files = {};
+    taskId = postSlug + "-metabox-" + mbId,
+    filename = customPostDir + taskId + ".inc";
     files[filename] = "src/grunt-includes/custom-post-meta-box.php";
 
     // Generate custom-post-meta-box.php for every metabox
@@ -115,7 +117,7 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir, tem
       taskNameList.push("string-replace:" + taskId);
 
       fieldFiles.push( filename );
-
+      settingDefaults.push('"' + settingResult.settingId + '" => "' + settingResult.settingId + '"');
     }
 
   /*********************************************************************************************************
@@ -168,6 +170,8 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir, tem
   /******************************************************************
   * tasks to generate php, css and js files for this custom post type
   *******************************************************************/
+  postReplacements.push(taskUtils.makeReplacementObject("custom-post-defaults", settingDefaults.join(",\r\n      ")));
+
   taskId = postSlug;
   // add a new string-replace task for this custom post
   stringReplaceTask[postSlug] = {
@@ -176,8 +180,8 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir, tem
     },
     files: [
       {expand: true, cwd: "src/plugin-template", src : ["**/custom-post-*.php"],  dest: distdir, ext: ".php.js" },
-      {expand: true, cwd: "src/plugin-template", src : ["**/custom-post-*.css"],  dest: distdir, ext: ".css.js" }
-      //,{expand: true, cwd: "src/plugin-template", src : ["**/*{plugin-widget*.*", "!**/*.php", "!**/*.css"],  dest: distdir }
+      {expand: true, cwd: "src/plugin-template", src : ["**/*custom-post-*.css"],  dest: distdir, ext: ".css.js" },
+      {expand: true, cwd: "src/plugin-template", src : ["**/*custom-post-*.js"],  dest: distdir }
     ]
   };
   taskNameList.push("string-replace:" + taskId);
@@ -187,7 +191,7 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir, tem
     options: {
       replacements: postReplacements
     },
-    files: [ { expand: true, cwd: distdir, src: "**/custom-post-*.*", dest: distdir }]
+    files: [ { expand: true, cwd: distdir, src: "**/*custom-post-*.*", dest: distdir }]
   }
   taskNameList.push("fileregexrename:" + taskId);
 
@@ -195,7 +199,6 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir, tem
 
   return {
     taskNameList: taskNameList,
-    settingFiles: settingFiles,
     tasks: {
       "string-replace": stringReplaceTask,
       "fileregexrename": fileRenameTask,

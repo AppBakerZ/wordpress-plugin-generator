@@ -12,8 +12,7 @@ class {plugin-class-name}_{custom-post-class-name}_Custom_Post
   /* Default values of post meta data to be used in metaboxes */
   // TODO: Default values for variables must be initialized
   private static $default_values = array(
-      'var1' => 'default-value-of-var-1',
-      'var2' => 'default-value-of-var-2',
+      {custom-post-defaults}
     );
 
   public function {plugin-class-name}_{custom-post-class-name}_Custom_Post() {
@@ -163,13 +162,15 @@ class {plugin-class-name}_{custom-post-class-name}_Custom_Post
    */
   private function register_script_and_style() {
 
+    parent::register_script_and_style_base();
+
     wp_register_script( $this->prefix . '-script',
-                        {plugin-class-name}_Info::$plugin_url . '/assets/js/admin-custom-post-{custom-post-slug}.js',
+                        {plugin-class-name}_Info::$plugin_url . '/assets/js/admin-edit-{custom-post-slug}.js',
                         array( 'jquery' ),
                         {plugin-class-name}_Info::version );
 
     wp_register_style( $this->prefix . '-style',
-                      {plugin-class-name}_Info::$plugin_url . '/assets/css/admin-custom-post-{custom-post-slug}.css',
+                      {plugin-class-name}_Info::$plugin_url . '/assets/css/admin-edit-{custom-post-slug}.css',
                       array(),
                       {plugin-class-name}_Info::version );
   }
@@ -204,7 +205,12 @@ class {plugin-class-name}_{custom-post-class-name}_Custom_Post
     }
     */
 
-    //Enqueue our custom javascript file
+    //Enqueue base css file
+    foreach(parent::$styles as $style) {
+      wp_enqueue_style($style);
+    }
+
+    //Enqueue our custom css file
     wp_enqueue_style($this->prefix . '-style');
 
     //Enqueue our custom javascript file

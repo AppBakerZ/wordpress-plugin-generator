@@ -1,0 +1,1 @@
+All client docs should be placed in this folder.

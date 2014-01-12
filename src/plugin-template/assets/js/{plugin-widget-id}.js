@@ -1,7 +1,7 @@
 /**
  * Public facing javascript for {plugin-widget-id}.
  *
-// @include ../../../temp/header-comments.txt
+// @include ../../../../temp/header-comments.txt
  */
 
 (function ($) {

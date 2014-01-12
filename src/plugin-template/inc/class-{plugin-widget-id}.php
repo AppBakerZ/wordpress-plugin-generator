@@ -4,7 +4,7 @@
  *
  * Encapsulates all functionality for widget
  *
-// @include ../../temp/header-comments.txt
+// @include ../../../temp/header-comments.txt
  *
  */
 

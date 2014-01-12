@@ -1,7 +1,8 @@
-*
+/**
  * {plugin-name} public facing js file
  *
-// @include ../../../temp/header-comments.txt
+// @include ../../../../temp/header-comments.txt
+ */
  
 
 (function ($) {

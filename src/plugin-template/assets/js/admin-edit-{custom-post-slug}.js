@@ -1,7 +1,7 @@
 /**
  * Admin javascript for {custom-post-slug} Custom Post.
  *
-// @include ../../../temp/header-comments.txt
+// @include ../../../../temp/header-comments.txt
  */
 
 jQuery(function ($) {

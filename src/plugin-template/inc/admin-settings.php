@@ -2,7 +2,7 @@
 /**
  * Admin class for {plugin-name}
  *
-// @include ../../temp/header-comments.txt
+// @include ../../../temp/header-comments.txt
  */
 
 class {plugin-class-name}_Admin {
@@ -177,7 +177,7 @@ class {plugin-class-name}_Admin {
     $page = {plugin-class-name}_Info::settings_page_slug;
 
 // @ifdef SETTINGS
-// @include ../../temp/handle_admin_init.txt
+// @include ../../../temp/handle_admin_init.txt
 // @endif
 
   }
@@ -290,7 +290,7 @@ class {plugin-class-name}_Admin {
 
 
 // @ifdef SETTINGS
-// @include ../../temp/sections-functions.inc
+// @include ../../../temp/sections-functions.inc
 // @endif
 
 

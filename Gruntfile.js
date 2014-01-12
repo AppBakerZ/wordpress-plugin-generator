@@ -5,6 +5,10 @@
 * Copyright: 2013 AppBakerZ (appbakerz.com)
 ***************************************************************/
 
+var distdirRoot = "dist/",
+    tempdir = distdirRoot + "temp/",
+    finalIncludesDir = tempdir + "final-includes/";
+
 function extend(defaults, override){
     for(var key in override) {
         if(override.hasOwnProperty(key)) {
@@ -108,10 +112,8 @@ module.exports = function(grunt) {
   copyValueIfMissing(buildParams, "owner-email", "author-email");
   copyValueIfMissing(buildParams, "owner-uri", "author-uri");
 
-	var distdirRoot = "dist/",
-      tempdir = distdirRoot + "temp/",
-      finalIncludesDir = tempdir + "final-includes/",
-      distdir = distdirRoot + buildParams["plugin-slug"] + "/", // The path to package directory
+  var repodir = distdirRoot + buildParams["plugin-slug"] + "/",
+      distdir = repodir + "src/", // The path to package directory
       replacements = [];
 
   for(key in buildParams) {
@@ -146,11 +148,12 @@ module.exports = function(grunt) {
       },
 
       files: [
-        // Note that .php/.css files are copied as .php.js/.css.js. This is to hack preprocess to think .php.js file as js files
-        {expand: true, cwd: "src/plugin-template", src : phpSourceFiles,  dest: distdir, ext: ".php.js" },
-        {expand: true, cwd: "src/plugin-template", src : ["**/*.css", "!**/*plugin-widget*.css","!**/*custom-post*.css"],  dest: distdir, ext: ".css.js" },
-        {expand: true, cwd: "src/plugin-template", src : ["**/*.*", "!**/*.css", "!**/*.php", "!**/*plugin-widget*.*", "!**/*custom-post*.*"],  dest: distdir },
-        {expand: true, cwd: "src/grunt-includes", src : ["**/*.*"],  dest: tempdir }
+          // Note that .php/.css files are copied as .php.js/.css.js. This is to hack preprocess to think .php.js file as js files
+          {expand: true, cwd: "src/plugin-template", src : phpSourceFiles,  dest: distdir, ext: ".php.js" },
+          {expand: true, cwd: "src/plugin-template", src : ["**/*.css", "!**/*plugin-widget*.css","!**/*custom-post*.css"],  dest: distdir, ext: ".css.js" },
+          {expand: true, cwd: "src/plugin-template", src : ["**/*.*", "!**/*.css", "!**/*.php", "!**/*plugin-widget*.*", "!**/*custom-post*.*"],  dest: distdir },
+          {expand: true, cwd: "src/grunt-includes", src : ["**/*.*"], dest: tempdir },
+          {expand: true, cwd: "src/dev", src : ["**/*.*"],  dest: repodir }
         ]
     },
 	},
@@ -161,7 +164,10 @@ module.exports = function(grunt) {
       options: {
         replacements: replacements
       },
-      files: [ { expand: true, cwd: distdir, src: "**/*.*", dest: distdir }]
+      files: [ 
+          //{ expand: true, cwd: repodir, src: ["**/*.*", "!**/src/*.*"], dest: repodir },
+          { expand: true, cwd: distdir, src: "**/*.*", dest: distdir }
+        ]
 
 	  },
 

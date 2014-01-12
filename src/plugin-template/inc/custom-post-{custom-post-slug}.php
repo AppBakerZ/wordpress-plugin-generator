@@ -3,7 +3,7 @@
  * Defines {custom-post-class-name}_Custom_Post custom post. This class contains functions for customizing 
  * the add/edit page and posts list page.
  *
-// @include ../../temp/header-comments.txt
+// @include ../../../temp/header-comments.txt
  **/
 
 class {plugin-class-name}_{custom-post-class-name}_Custom_Post 
@@ -243,11 +243,11 @@ class {plugin-class-name}_{custom-post-class-name}_Custom_Post
    * */
   protected function add_meta_boxes() {
     // Add as many meta boxes as you need here
-// @include ../../temp/{custom-post-slug}-handle-add-meta-boxes.inc
+// @include ../../../temp/{custom-post-slug}-handle-add-meta-boxes.inc
   }
 
   /********************************** Metaboxes Related ******************************************/
-// @include ../../temp/{custom-post-slug}-metaboxes.inc
+// @include ../../../temp/{custom-post-slug}-metaboxes.inc
 
 }
 

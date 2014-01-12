@@ -2,7 +2,7 @@
 /**
  * {plugin-desc}
  * 
-// @include ../temp/header-comments.txt
+// @include ../../temp/header-comments.txt
  *
  * @wordpress-plugin
  * Plugin Name: {plugin-name}
@@ -68,15 +68,20 @@ class {plugin-class-name}_Info {
   	public static function init() {
       self::$plugin_dir = untrailingslashit( dirname( __FILE__ ) );
       self::$plugin_url = untrailingslashit( plugins_url( '', __FILE__ ) );
-      self::$plugin_basename = plugin_basename( __FILE__ );
       
+      $plugin_basename = plugin_basename( __FILE__ );
+      $plugin_basename = explode("src/", $plugin_basename);
+      self::$plugin_basename = implode( $plugin_basename );
+
+
+
       // @ifdef SETTINGSPAGE
       // Load admin only when required
       add_action( 'admin_menu', array('{plugin-class-name}_Info','handle_admin_menu') );
       // @endif
       // @ifdef CUSTOMPOSTS
       require(plugin_dir_path(__FILE__) . 'inc/custom-post-base.php');      
-// @include ../temp/final-includes/custom-post-require.inc
+// @include ../../temp/final-includes/custom-post-require.inc
       // @endif
     }
     
@@ -95,7 +100,7 @@ class {plugin-class-name}_Info {
 // include plugin's class file
 require( plugin_dir_path( __FILE__ ) . 'inc/class-{plugin-slug}.php' );
 // @ifdef WIDGETS
-// @include ../temp/widgets.php
+// @include ../../temp/widgets.php
 // @endif
 // Register hooks that are fired when the plugin is activated, deactivated, and uninstalled, respectively.
 register_activation_hook( __FILE__, array( '{plugin-class-name}', 'activate' ) );

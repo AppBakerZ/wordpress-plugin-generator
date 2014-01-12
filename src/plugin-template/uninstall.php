@@ -2,7 +2,7 @@
 /**
  * Fired when the plugin is uninstalled.
  *
-#INCLUDE header-comments
+// @include ../../temp/header-comments.txt
  */
 
 // If uninstall, not called from WordPress, then exit

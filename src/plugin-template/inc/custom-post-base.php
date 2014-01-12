@@ -2,7 +2,7 @@
 /**
  * Defines {plugin-class-name}_Custom_Post_Base class. 
  *
-// @include ../../temp/header-comments.txt
+// @include ../../../temp/header-comments.txt
  **/
 
 class {plugin-class-name}_Custom_Post_Base {

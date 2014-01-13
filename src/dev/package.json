@@ -1,0 +1,34 @@
+{
+  "name": "{plugin-slug}",
+  "title": "{plugin-name}",
+  "description": "{plugin-desc}",
+  "version": "0.1.0",
+  "homepage": "",
+  "author": {
+    "name": "{author-name}",
+    "email": "{author-email}",
+    "url": "{author-uri}"
+  },
+  "repository": {
+    "type": "git",
+    "url": "none"
+  },
+  "bugs": {
+    "url": ""
+  },
+  "licenses": [
+    {
+      "type": "none",
+      "url": "/blob/master/LICENSE"
+    }
+  ],
+  "dependencies": {},
+  "keywords": [],
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-copy": "~0.5.0",
+    "grunt-contrib-compress": "~0.5.3",
+    "grunt-string-replace": "~0.2.7"
+  }
+}

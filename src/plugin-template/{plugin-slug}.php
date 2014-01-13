@@ -8,7 +8,7 @@
  * Plugin Name: {plugin-name}
  * Plugin URI:  {plugin-uri}
  * Description: {plugin-desc}
- * Version:     0.1.0
+ * Version:     ___version___
  * Author:      {author-name}
  * Author URI:  {author-uri}
  * Text Domain: {plugin-slug}-locale
@@ -50,7 +50,7 @@ class {plugin-class-name}_Info {
 	 * @since    0.1.0
 	 * @var      string
 	 */
-  	const version = '0.1.0';
+  	const version = '___version___';
 
   	const required_wp_version = '3.0';
     

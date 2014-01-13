@@ -2,7 +2,7 @@
 /**************************************************************
 * Author:    Kashif Iqbal Khan
 * Email:     kashiif@gmail.com
-* Copyright: 2013 AppBakerZ (appbakerz.com)
+* Copyright: 2013-2014 AppBakerZ (appbakerz.com)
 ***************************************************************/
 
 var distdirRoot = "dist/",
@@ -132,7 +132,28 @@ module.exports = function(grunt) {
 
   array2file: {},
 
-	clean: [tempdir, distdirRoot + "temp2/", distdirRoot + buildParams["plugin-slug"], "dist/"],
+	clean: [
+            tempdir + "custom-posts",
+            tempdir + "final-includes",
+            tempdir,
+            distdirRoot + "temp2/",
+            distdirRoot + buildParams["plugin-slug"], "dist/"
+          ],
+
+  copy: {
+    "grunt-modules": {
+      src : ["grunt-modules/copyhelper.js"],
+      dest: repodir
+    },
+    "node-modules": {
+      files: [
+          // Note that .php/.css files are copied as .php.js/.css.js. This is to hack preprocess to think .php.js file as js files
+          {expand: true, cwd: "node_modules", dest: repodir + "node_modules/grunt-contrib-clean/", src : ["grunt-contrib-clean/**"] },
+          {expand: true, cwd: "node_modules", dest: repodir + "node_modules/grunt-contrib-copy/", src : ["grunt-contrib-copy/**"] },
+          {expand: true, cwd: "node_modules", dest: repodir + "node_modules/grunt-string-replace/", src : ["grunt-string-replace/**"] }
+        ]
+    }
+  },
 
   concat: {
     "merge-section-functions": {
@@ -153,7 +174,7 @@ module.exports = function(grunt) {
           {expand: true, cwd: "src/plugin-template", src : ["**/*.css", "!**/*plugin-widget*.css","!**/*custom-post*.css"],  dest: distdir, ext: ".css.js" },
           {expand: true, cwd: "src/plugin-template", src : ["**/*.*", "!**/*.css", "!**/*.php", "!**/*plugin-widget*.*", "!**/*custom-post*.*"],  dest: distdir },
           {expand: true, cwd: "src/grunt-includes", src : ["**/*.*"], dest: tempdir },
-          {expand: true, cwd: "src/dev", src : ["**/*.*"],  dest: repodir }
+          {expand: true, cwd: "src/dev/", src : ["**/*.*", ".gitignore"],  dest: repodir }
         ]
     },
 	},
@@ -165,11 +186,20 @@ module.exports = function(grunt) {
         replacements: replacements
       },
       files: [ 
-          //{ expand: true, cwd: repodir, src: ["**/*.*", "!**/src/*.*"], dest: repodir },
           { expand: true, cwd: distdir, src: "**/*.*", dest: distdir }
         ]
 
 	  },
+
+    repodir: {
+      options: {
+        replacements: replacements
+      },
+      files: [ 
+          { expand: true, cwd: repodir, src: "*.*", dest: repodir }
+        ]
+
+    },
 
 	},
 
@@ -366,6 +396,7 @@ module.exports = function(grunt) {
 
 	grunt.loadNpmTasks("grunt-contrib-clean");
   grunt.loadNpmTasks("grunt-contrib-concat");
+  grunt.loadNpmTasks("grunt-contrib-copy");
 	grunt.loadNpmTasks('grunt-preprocess');
   grunt.loadNpmTasks("grunt-string-replace");
   grunt.loadNpmTasks("grunt-file-regex-rename");
@@ -415,7 +446,7 @@ module.exports = function(grunt) {
   taskList.push("generate-include-files");
 
 
-  grunt.registerTask("perform-final-tasks", "Copies empty index.php file to every folder", function() {
+  grunt.registerTask("perform-final-tasks", "", function() {
 
     // Force task into async mode and grab a handle to the "done" function.
     var done = this.async();
@@ -431,9 +462,11 @@ module.exports = function(grunt) {
           return;
       }
 
+      /*
       found.dirs.forEach(function(item){
         grunt.file.copy("src/grunt-includes/index.php",  path.resolve(path.join(item, "index.php")));
       });
+      */
 
       found.files.forEach(function(item){
         // if the file extension is .php.js or .css.js, remove the trailing .js
@@ -458,6 +491,9 @@ module.exports = function(grunt) {
 	// Default task(s).
   taskList.push("concat:merge-section-functions");
   taskList.push("preprocess");
+  taskList.push("copy:grunt-modules");
+  taskList.push("copy:node-modules");
+  taskList.push("fileregexrename:repodir");
   taskList.push("perform-final-tasks");
 
 	grunt.registerTask("default", taskList);

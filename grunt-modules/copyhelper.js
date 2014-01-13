@@ -1,5 +1,12 @@
 "use strict;"
 
+/**************************************
+ * Author: Kashif Iqbal Khan
+ * Email: kashiif@gmail.com
+ * License: MIT
+ * Copyright (c) 2013-2014 Kashif Iqbal Khan
+ **************************************/
+
 var fs  = require('fs'),
     path = require('path');
 

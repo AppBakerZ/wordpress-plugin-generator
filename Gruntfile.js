@@ -174,7 +174,7 @@ module.exports = function(grunt) {
           {expand: true, cwd: "src/plugin-template", src : ["**/*.css", "!**/*plugin-widget*.css","!**/*custom-post*.css"],  dest: distdir, ext: ".css.js" },
           {expand: true, cwd: "src/plugin-template", src : ["**/*.*", "!**/*.css", "!**/*.php", "!**/*plugin-widget*.*", "!**/*custom-post*.*"],  dest: distdir },
           {expand: true, cwd: "src/grunt-includes", src : ["**/*.*"], dest: tempdir },
-          {expand: true, cwd: "src/dev/", src : ["**/*.*", ".gitignore"],  dest: repodir }
+          {expand: true, cwd: "src/repo-dir/", src : ["**/*.*", ".gitignore"],  dest: repodir }
         ]
     },
 	},

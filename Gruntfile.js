@@ -148,11 +148,11 @@ module.exports = function(grunt) {
     "node-modules": {
       files: [
           // Note that .php/.css files are copied as .php.js/.css.js. This is to hack preprocess to think .php.js file as js files
-          //{expand: true, cwd: "node_modules", dest: repodir + "node_modules/grunt/", src : ["grunt/**"] },
-          {expand: true, cwd: "node_modules", dest: repodir + "node_modules/grunt-contrib-clean/", src : ["grunt-contrib-clean/**"] },
-          {expand: true, cwd: "node_modules", dest: repodir + "node_modules/grunt-contrib-copy/", src : ["grunt-contrib-copy/**"] },
-          {expand: true, cwd: "node_modules", dest: repodir + "node_modules/grunt-string-replace/", src : ["grunt-string-replace/**"] },
-          {expand: true, cwd: "node_modules", dest: repodir + "node_modules/gettext-parser/", src : ["gettext-parser/**"] }
+          {expand: true, cwd: "node_modules", dest: repodir + "node_modules/", src : ["grunt/**"] },
+          {expand: true, cwd: "node_modules", dest: repodir + "node_modules/", src : ["grunt-contrib-clean/**"] },
+          {expand: true, cwd: "node_modules", dest: repodir + "node_modules/", src : ["grunt-contrib-copy/**"] },
+          {expand: true, cwd: "node_modules", dest: repodir + "node_modules/", src : ["grunt-string-replace/**"] },
+          {expand: true, cwd: "node_modules", dest: repodir + "node_modules/", src : ["gettext-parser/**"] }
         ]
     }
   },

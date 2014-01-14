@@ -60,7 +60,8 @@ function updateFile(dest, tokens, fmsgText, updateMethod) {
 
   return {
     compiled: compiled,
-    updateCount: updateCount
+    updateCount: updateCount,
+    translationObj: translationFile
   };
 
 }
@@ -154,17 +155,18 @@ module.exports = function(gruntLocal) {
 
         // generate en-US po file
         updateFileResult = updateFile(path.join(dirname, basename + "-en_US.po"), JSON.parse(JSON.stringify(tokens)), msgTextForPo, options.method);
-        var compiledPo = updateFileResult.compiled;
 
-        var compiledMo = gettextParser.mo.compile(compiledPo);
+        var bufferMo = gettextParser.mo.compile(updateFileResult.translationObj);
+        //grunt.file.write(path.join(dirname, basename + "-en_US.mo"), bufferMo);
 
-        grunt.file.write(path.join(dirname, basename + "-en_US.mo"), compiledMo);
+        var fd =  fs.openSync(path.join(dirname, basename + "-en_US.mo"), "w");
+        fs.writeSync(fd, bufferMo, 0, bufferMo.length, 0);
+        fs.closeSync(fd);
 
         // generate en-US-test po file
         updateFileResult = updateFile(path.join(dirname, basename + "-en_TEST.po"), JSON.parse(JSON.stringify(tokens)), msgTextForTestPo, options.method);
-        compiledPo = updateFileResult.compiled;
 
-        compiledMo = gettextParser.mo.compile(compiledPo);
+        compiledMo = gettextParser.mo.compile(updateFileResult.translationObj);
         grunt.file.write(path.join(dirname, basename + "-en_TEST.mo"), compiledMo);
       }
 

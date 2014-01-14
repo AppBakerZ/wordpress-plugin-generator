@@ -95,8 +95,11 @@ class {plugin-class-name} {
 		$domain = {plugin-class-name}_Info::slug;
 		$locale = apply_filters( 'plugin_locale', get_locale(), $domain );
 
+    $plugin_rel_path = dirname(dirname(__FILE__)) . '/lang/';
+    $plugin_rel_path = substr($plugin_rel_path, strlen(WP_PLUGIN_DIR)+1 );
+
 		load_textdomain( $domain, WP_LANG_DIR . '/' . $domain . '/' . $domain . '-' . $locale . '.mo' );
-		load_plugin_textdomain( $domain, FALSE, {plugin-class-name}_Info::slug . '/lang/' );
+		load_plugin_textdomain( $domain, FALSE, $plugin_rel_path );
 	}
 
   /**

@@ -118,7 +118,7 @@ module.exports = function(grunt) {
 
 
   // Default task(s).
-  grunt.registerTask("default", ["clean", "generate-translation:partial", "copy", "string-replace", "index-php", "compress"]);
+  grunt.registerTask("default", ["clean", /*"generate-translation:partial",*/ "copy", "string-replace", "index-php", "compress"]);
 
   grunt.registerTask("l8n", ["generate-translation:full"]);
 

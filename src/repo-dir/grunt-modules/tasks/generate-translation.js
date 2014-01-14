@@ -11,8 +11,6 @@ var fs = require("fs"),
     gettextParser = require("gettext-parser"),
     grunt = null;
 
-const RE_TOKEN_EXTRACTOR = /__\(\s*('(.+)'|"(.+)")\s*,\s*('.+'|".+")\s*\)/g;
-
 function msgTextForPot(str) {
   return "";
 }
@@ -53,6 +51,7 @@ function updateFile(dest, tokens, fmsgText, updateMethod) {
 
   var compiled = null;
 
+  //grunt.log.write("updateMethod: " + updateMethod + ", " + (updateMethod != "append" || updateCount));
   // always generate file when updateMethod is overwrite or touch or a new entry is found
   if (updateMethod != "append" || updateCount) {
     compiled = gettextParser.po.compile(translationFile);
@@ -64,6 +63,34 @@ function updateFile(dest, tokens, fmsgText, updateMethod) {
     updateCount: updateCount
   };
 
+}
+
+function processLine(line, tokens, lineNumber, src) {
+  var match;
+  var RE_TOKEN_EXTRACTOR = new RegExp( /__\(\s*('(.+)'|"(.+)")\s*,\s*('.+'|".+")\s*\)/g);
+
+  while ((match = RE_TOKEN_EXTRACTOR.exec(line))) {
+    var str = match[2] || match[3];
+
+    if (tokens.hasOwnProperty (str)) {
+      var existing = tokens[str];
+
+      var refText = src + ":" + lineNumber;
+      if (existing.comments.reference.indexOf(refText) < 0) {
+        existing.comments.reference += " " + refText;
+      }
+      return;
+    }
+
+    tokens[str] = {
+      "msgid": str,
+      "comments": {
+        "reference": src + ":" + lineNumber
+      },
+      "msgstr": []
+    };
+    grunt.log.debug(str);
+  } // while match found
 }
 
 module.exports = function(gruntLocal) {
@@ -92,39 +119,34 @@ module.exports = function(gruntLocal) {
       var tokens = {};
 
       f.src.forEach(function(src) {
-        grunt.log.debug("f: " + src + " - " + f.dest);
+        grunt.log.debug("f: " + src);
+        grunt.log.debug("----------------------------------------------------");
         var content = grunt.file.read(src),
           match;
 
-        //grunt.log.debug("content.length " + content.length);
+        // Need to parse file line by line as using regex on a string that has match after 2^128 number of characters
+        // would fail silently
+        var linefeed = grunt.util.linefeed,
+            start = 0, end,
+            lineNumber = 0;
+            line = null;
 
-        while ((match = RE_TOKEN_EXTRACTOR.exec(content))) {
-          var str = match[2] || match[3];
-
-          if (tokens.hasOwnProperty (str)) {
-            var existing = tokens[str];
-            // TODO: avoid duplicate source files
-            existing.comments.reference += " " + src + ":1";
-            return;
-          }
-
-          tokens[str] = {
-            "msgid": str,
-            "comments": {
-              "reference": src + ":1"
-            },
-            "msgstr": []
-          };
-          grunt.log.debug(match[2]);
+        while ((end = content.indexOf(linefeed, start)) >= 0) {
+          line = content.substr(start, end-start);
+          processLine(line, tokens, ++lineNumber, src);
+          start = end+1;
         }
+        line = content.substr(start);
+        processLine(line, tokens, ++lineNumber, src);
 
-        grunt.log.debug("-");
+        grunt.log.debug("---");
 
       }); // end f.src.forEach
 
       var basename = path.basename(f.dest, ".pot"),
         dirname = path.dirname(f.dest);
 
+      grunt.log.debug("Found strings: " + Object.keys(tokens).length);
       // generate pot file
       var updateFileResult = updateFile(f.dest, tokens, msgTextForPot, options.method);
 

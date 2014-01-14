@@ -52,7 +52,22 @@ module.exports = function(grunt) {
       }
     },
 
+    "generate-translation": {
+      full: {
+        options: {
+          method:'touch'
+        },
+        files: {
+          "src/lang/abz-course-management.pot": [ "src/inc/*.php", "!**/index.php"]
+        }
+      },
 
+      partial: {
+        files: {
+          "src/lang/abz-course-management.pot": [ "src/inc/*.php", "!**/index.php"]
+        }
+      }
+    },
 
     compress: {
       prod: {
@@ -70,6 +85,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-string-replace");
 
   grunt.loadNpmTasks("grunt-contrib-compress");
+
+  grunt.loadTasks("./grunt-modules/tasks/");
 
   grunt.registerTask("index-php", "Copies empty index.php file to every folder", function() {
 
@@ -100,9 +117,9 @@ module.exports = function(grunt) {
 
 
 
-
-
   // Default task(s).
-  grunt.registerTask("default", ["clean", "copy", "string-replace", "index-php", "compress"]);
+  grunt.registerTask("default", ["clean", "generate-translation:partial", "copy", "string-replace", "index-php", "compress"]);
+
+  grunt.registerTask("l8n", ["generate-translation:full"]);
 
 };

@@ -28,7 +28,8 @@
     "grunt-string-replace": "~0.2.3",
     "grunt-file-regex-rename": "~0.1.0",
     "grunt-contrib-clean": "~0.5.0",
-    "grunt-contrib-concat": "~0.3.0"
+    "grunt-contrib-concat": "~0.3.0",
+    "gettext-parser": "~0.2.0"
   },
   "keywords": [],
   "devDependencies": {}

@@ -99,7 +99,7 @@ module.exports = function(gruntLocal) {
         //grunt.log.debug("content.length " + content.length);
 
         while ((match = RE_TOKEN_EXTRACTOR.exec(content))) {
-          var str = match[2];
+          var str = match[2] || match[3];
 
           if (tokens.hasOwnProperty (str)) {
             var existing = tokens[str];

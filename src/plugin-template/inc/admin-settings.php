@@ -281,7 +281,7 @@ class {plugin-class-name}_Admin {
       echo "<label>";
       echo "<input type='checkbox'"
               . checked( $field[$value], 'on', false )
-              . "name='abz-test-plugin-settings[$field_name][$value]' value='on'/>";
+              . "name='{plugin-slug}-settings[$field_name][$value]' value='on'/>";
       echo " $label</label><br>";
     }
 

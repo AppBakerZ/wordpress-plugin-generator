@@ -197,7 +197,7 @@ class {plugin-class-name}_Custom_Post_Base {
   }
 
   /**
-   * Outputs html for a <select> element corrsponding a setting.
+   * Outputs html for a <select> element corresponding a setting.
    *
    * @param $options Associative array having value => label entries. Each array element would become a <radio> element.
    */
@@ -222,7 +222,7 @@ class {plugin-class-name}_Custom_Post_Base {
 
 
   /**
-   * Outputs html for a <input type="radio"> element corrsponding a setting.
+   * Outputs html for a <input type="radio"> element corresponding a setting.
    *
    * @param $options Associative array having value => label entries. Each array element would become a <radio> element.
    */
@@ -241,7 +241,7 @@ class {plugin-class-name}_Custom_Post_Base {
   }
 
   /**
-   * Outputs html for a <input type="checkbox"> element corrsponding a setting.
+   * Outputs html for a <input type="checkbox"> element corresponding a setting.
    * Typically use this only for a checkbox group. A single on/off setting should use a 
    * <select> or <input type="radio">.
    *

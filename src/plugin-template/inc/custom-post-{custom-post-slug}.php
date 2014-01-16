@@ -110,7 +110,7 @@ class {plugin-class-name}_{custom-post-class-name}_Custom_Post
       'menu_position' => null,
 
       /* (array/boolean) (optional) An alias for calling add_post_type_support() directly. 
-         As of 3.5, boolean false can be passed as value instead of an array to prevent default (title and editor) behavior.
+         As of 3.5, boolean false can be passed as value instead of an array to prevent default (title and editor) behaviour.
          Default: title and editor */
       'supports' => array('title', 'thumbnail')
     );
@@ -185,7 +185,7 @@ class {plugin-class-name}_{custom-post-class-name}_Custom_Post
       return;
     }
 
-    // check that post being editied is our custom post type
+    // check that post being edited is our custom post type
     if ( $this->post_type !== $post->post_type ) {
       return;
     }
@@ -220,12 +220,11 @@ class {plugin-class-name}_{custom-post-class-name}_Custom_Post
   /***************************** Override Template Pattern Functions *********************************/
 
   protected function get_default_values() {
-    // TODO: template - raise exception to enforce override
     return self::$default_values;
   }
 
   /**
-   * Child classes must override filter_post_data_on_save to save and sanatize post meta data 
+   * Child classes must override filter_post_data_on_save to save and sanitize post meta data 
    * 
    * @param original Associative array of meta data values from database
    * @param changed Associative array of meta data values submitted by user
@@ -233,7 +232,7 @@ class {plugin-class-name}_{custom-post-class-name}_Custom_Post
    * @return void
    **/
   protected function filter_post_data_on_save($original, $changed) {
-    // TODO: template - raise exception to enforce override    
+    // TODO: Implement custom sanitization logic here or leave default implementation
     return $changed;
   }
 

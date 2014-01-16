@@ -92,6 +92,7 @@ module.exports = function(grunt) {
       }
   }
 
+  
 	if (buildParams["plugin-slug"]) {
     // TODO: validate that plugin-slug should not contain invalid chars
   } else {
@@ -438,7 +439,7 @@ module.exports = function(grunt) {
                         metaBoxes.map(function(mb){
                             return "    $this->add_meta_box('"
                                     + mb.id
-                                    + "', __('"+ mb.name +"', '{plugin-slug}'), "
+                                    + "', __('"+ mb.name +"', '" + buildParams["plugin-slug"] + "'), "
                                     + "'render_" + mb.funcName + "_metabox');";
                           }).join("\r\n")
                       );

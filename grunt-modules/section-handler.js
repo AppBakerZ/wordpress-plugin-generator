@@ -6,7 +6,8 @@ var namingHelper = require("./naming-helper.js"),
 
 exports.generate = function(grunt, section, buildParams, replacements, distdirRoot) {
 
-  var meta = section["pluginGeneratorMeta"],
+  var pluginSlug = buildParams["plugin-slug"],
+      meta = section["pluginGeneratorMeta"],
       sectionTitle = meta.title,
       sectionIndex = meta.index;
 
@@ -74,7 +75,7 @@ exports.generate = function(grunt, section, buildParams, replacements, distdirRo
     // we need new replacement object for every setting
     var settingReplacements = sectionReplacements.map(function(item) { return item; } );
 
-    var settingResult = taskUtils.processSingleField(settingName, setting, settingReplacements);
+    var settingResult = taskUtils.processSingleField(settingName, setting, settingReplacements, pluginSlug);
 
 
     taskId = sectionId + "-" + settingResult.settingId;

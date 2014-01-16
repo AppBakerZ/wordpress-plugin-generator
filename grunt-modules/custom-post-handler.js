@@ -19,7 +19,8 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir, tem
       fileRenameTask = {},
       concatTask = {};
 
-  var postSlug = post.slug || namingHelper.makeWpId(post.name);
+  var pluginSlug = buildParams["plugin-slug"],
+      postSlug = post.slug || namingHelper.makeWpId(post.name);
 
   var postClassName = post["class-name"];
   if (postClassName) {
@@ -96,7 +97,7 @@ exports.generate = function(grunt, post, buildParams, replacements, distdir, tem
       // we need new replacement object for every setting
       var settingReplacements = metaboxReplacements.map(function(item) { return item; } );
 
-      var settingResult = taskUtils.processSingleField(settingName, setting, settingReplacements);
+      var settingResult = taskUtils.processSingleField(settingName, setting, settingReplacements, pluginSlug);
 
       taskId = postSlug + "-mbfield-" + mbId + "-" + settingResult.settingId;
       filename = customPostDir + taskId + ".inc";

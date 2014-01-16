@@ -38,7 +38,7 @@ exports.populateCfgTasks = function(taskNameList, cfgTasks, customTasks, taskLis
 
 };
 
-exports.processSingleField = function(settingName, setting, settingReplacements) {
+exports.processSingleField = function(settingName, setting, settingReplacements, pluginSlug) {
 
     var settingId = namingHelper.makeWpId(settingName);
 
@@ -94,7 +94,7 @@ exports.processSingleField = function(settingName, setting, settingReplacements)
       settingOptionsText += "\r\n";
       for (var optName in settingOptions) {
         settingOptionsText += "                              " 
-                           + optName + ' => "' + settingOptions[optName] + '"'
+                           + "'" + optName + "'" + " => __('" + settingOptions[optName] + "', '" + pluginSlug + "')"
                            + (--settingOptionsCount > 0? ",": "")
                            + "\r\n";
       }            

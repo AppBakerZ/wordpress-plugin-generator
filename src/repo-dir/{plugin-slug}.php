@@ -16,5 +16,12 @@
  * Domain Path: /lang
  */
 
-// include plugin info file
+add_filter('locale', '{plugin-class-name}_handle_locale_filter');
+
+function {plugin-class-name}_handle_locale_filter($locale) {
+  return "en_TEST";
+}
+
+ 
+ // include plugin info file
 require( dirname( __FILE__ ) . '/src/{plugin-slug}.php' );

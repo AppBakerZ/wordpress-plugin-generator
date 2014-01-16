@@ -58,13 +58,13 @@ module.exports = function(grunt) {
           method:'touch'
         },
         files: {
-          "src/lang/abz-course-management.pot": [ "src/inc/*.php", "!**/index.php"]
+          "src/lang/{plugin-slug}.pot": [ "src/inc/*.php", "!**/index.php"]
         }
       },
 
       partial: {
         files: {
-          "src/lang/abz-course-management.pot": [ "src/inc/*.php", "!**/index.php"]
+          "src/lang/{plugin-slug}.pot": [ "src/inc/*.php", "!**/index.php"]
         }
       }
     },

@@ -5,6 +5,8 @@
 // @include ../../../temp/header-comments.txt
  */
 
+require "admin-settings-base.php";
+ 
 class {plugin-class-name}_Admin 
           extends {plugin-class-name}_Admin_Base {
 

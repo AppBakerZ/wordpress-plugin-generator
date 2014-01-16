@@ -48,12 +48,25 @@ class {plugin-class-name} {
    */
   public function handle_init() {
     $this->load_plugin_textdomain();
+
+  // @ifdef CUSTOMPOSTS
+    $this->load_custom_post_types();
+  // @endif
+
     $this->register_script_and_style();
 
 		// Load public-facing style sheet and JavaScript.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
   }
+  
+  // @ifdef CUSTOMPOSTS
+  private function load_custom_post_types() {
+    require(plugin_dir_path(__FILE__) . 'custom-post-base.php');
+// @include ../../../temp/final-includes/custom-post-require.inc  
+  }
+  // @endif
+  
 
 	/**
 	 * Fired when the plugin is activated.

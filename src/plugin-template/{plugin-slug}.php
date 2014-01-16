@@ -79,10 +79,6 @@ class {plugin-class-name}_Info {
       // Load admin only when required
       add_action( 'admin_menu', array('{plugin-class-name}_Info','handle_admin_menu') );
       // @endif
-      // @ifdef CUSTOMPOSTS
-      require(plugin_dir_path(__FILE__) . 'inc/custom-post-base.php');      
-// @include ../../temp/final-includes/custom-post-require.inc
-      // @endif
     }
     
     // @ifdef SETTINGSPAGE

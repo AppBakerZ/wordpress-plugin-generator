@@ -149,11 +149,14 @@ module.exports = function(grunt) {
     "node-modules": {
       files: [
           // Note that .php/.css files are copied as .php.js/.css.js. This is to hack preprocess to think .php.js file as js files
-          {expand: true, cwd: "node_modules", dest: repodir + "node_modules/", src : ["grunt/**"] },
-          {expand: true, cwd: "node_modules", dest: repodir + "node_modules/", src : ["grunt-contrib-clean/**"] },
-          {expand: true, cwd: "node_modules", dest: repodir + "node_modules/", src : ["grunt-contrib-copy/**"] },
-          {expand: true, cwd: "node_modules", dest: repodir + "node_modules/", src : ["grunt-string-replace/**"] },
-          {expand: true, cwd: "node_modules", dest: repodir + "node_modules/", src : ["gettext-parser/**"] }
+          {expand: true, cwd: "node_modules", dest: repodir + "node_modules/", src : [
+                                                                                        "grunt/**",
+                                                                                        "grunt-contrib-clean/**",
+                                                                                        "grunt-contrib-copy/**",
+                                                                                        "grunt-string-replace/**",
+                                                                                        "gettext-parser/**",
+                                                                                        "grunt-preprocess/**"
+                                                                                      ] }
         ]
     }
   },
@@ -180,6 +183,25 @@ module.exports = function(grunt) {
           {expand: true, cwd: "src/repo-dir/", src : ["**/*.*", ".gitignore"],  dest: repodir }
         ]
     },
+
+    plugininfofile: {
+      options: {
+        inline:true,
+        replacements: [{
+            pattern: /\@\@ifdef\s/g,
+            replacement: "@ifdef "
+          },{
+            pattern: /\@\@ifndef\s/g,
+            replacement: "@ifndef "
+          },{
+            pattern: /\@\@endif\s/g,
+            replacement: "@endif "
+          }
+          ]
+      },
+      src: distdir + buildParams["plugin-slug"] + ".php.js",
+      dest: distdir + buildParams["plugin-slug"] + ".php.js"
+    }
 	},
 
 
@@ -199,7 +221,7 @@ module.exports = function(grunt) {
         replacements: replacements
       },
       files: [ 
-          { expand: true, cwd: repodir, src: "*.*", dest: repodir }
+          { expand: true, cwd: repodir, src: ["*.*"], dest: repodir }
         ]
 
     },
@@ -495,9 +517,10 @@ module.exports = function(grunt) {
   taskList.push("concat:merge-section-functions");
   taskList.push("preprocess");
   taskList.push("copy:grunt-modules");
-  taskList.push("copy:node-modules");
-  taskList.push("fileregexrename:repodir");
-  taskList.push("perform-final-tasks");
+  taskList.push("string-replace:plugininfofile");
+//  taskList.push("fileregexrename:repodir");
+//  taskList.push("copy:node-modules");
+//  taskList.push("perform-final-tasks");
 
 	grunt.registerTask("default", taskList);
 };

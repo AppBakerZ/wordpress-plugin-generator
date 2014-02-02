@@ -60,6 +60,13 @@ class {plugin-class-name}_Info {
 
     public static $plugin_basename = '';
 
+    // @@ifdef PRODUCTION
+    // For demo build, the values of capability variables are overridden in init()
+    // @@endif
+    public static $capability_for_settings    = 'manage_options';
+    public static $capability_for_custom_post = 'post';
+
+
     /**
      * This function is called once on plugin load. It will initialize the static variables and also sets up appropriate hooks .
      *
@@ -73,7 +80,18 @@ class {plugin-class-name}_Info {
       $plugin_basename = explode("src/", $plugin_basename);
       self::$plugin_basename = implode( $plugin_basename );
 
-
+      // @@ifdef ALWAYS_FALSE
+      // ALWAYS_FALSE is never defined in any GRUNT task so the if statement and appropriate braces are always removed
+      if (false) {
+      // @@endif
+      // @@ifndef PRODUCTION
+      // Override the default capabilities for demo build
+      self::$capability_for_settings = 'manage_options_{plugin-slug}';
+      self::$capability_for_custom_post = 'post_{plugin-slug}';
+      // @@endif
+      // @@ifdef ALWAYS_FALSE
+      }
+      // @@endif
 
       // @ifdef SETTINGSPAGE
       // Load admin only when required

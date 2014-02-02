@@ -22,6 +22,7 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     pkg: pkg,
+    tempDir: tempDir,
 
     clean: {
       prod: [tempDir]
@@ -31,7 +32,7 @@ module.exports = function(grunt) {
     copy: {
       prod: {
         files: [
-          {expand: true, cwd: srcDir, src : ["**/*.*"], dest: tempDir }
+          {expand: true, cwd: srcDir, src : ["**/*.*", "!{plugin-slug}.php"], dest: tempDir }
         ]
       },
     },
@@ -50,6 +51,35 @@ module.exports = function(grunt) {
           {expand: true, dest: tempDir, cwd: tempDir, src : ["*.php"] }
         ]
       }
+    },
+
+    preprocess: {
+      options: {
+        // NOTE that if context is defined in the task, it will replace the global context, (not merge it)
+        // This looks like a grunt bug where deep merging is not performed for options
+        context : {
+
+        }
+      },
+      prod: {
+        options: {
+          //inline: true,
+          context : {
+            PRODUCTION: true
+          }
+        },
+        files: {
+           "<%=tempDir%>{plugin-slug}.php": [ srcDir + "{plugin-slug}.php"]
+        }
+      },
+      demo: {
+        options: {
+        },
+        files: {
+          "<%=tempDir%>{plugin-slug}.php": [ srcDir + "{plugin-slug}.php"]
+        }
+      }
+
     },
 
     "generate-translation": {
@@ -84,6 +114,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-contrib-copy");
   grunt.loadNpmTasks("grunt-string-replace");
 
+  grunt.loadNpmTasks("grunt-preprocess");
   grunt.loadNpmTasks("grunt-contrib-compress");
 
   grunt.loadTasks("./grunt-modules/tasks/");
@@ -118,7 +149,9 @@ module.exports = function(grunt) {
 
 
   // Default task(s).
-  grunt.registerTask("default", ["clean", /*"generate-translation:partial",*/ "copy", "string-replace", "index-php", "compress"]);
+  grunt.registerTask("default", ["clean", /*"generate-translation:partial",*/ "copy", "preprocess:prod", "string-replace", "index-php", "compress"]);
+
+  grunt.registerTask("demo", ["clean", /*"generate-translation:partial",*/    "copy", "preprocess:demo", "string-replace", "index-php", "compress"]);
 
   grunt.registerTask("l8n", ["generate-translation:full"]);
 

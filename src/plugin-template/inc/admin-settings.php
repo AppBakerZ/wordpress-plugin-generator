@@ -69,10 +69,10 @@ class {plugin-class-name}_Admin
    */
   public function handle_admin_menu() {
     add_action( 'admin_init', array( $this, 'handle_admin_init') );
-    $this->plugin_screen_hook_suffix = add_options_page( 
+    $this->screen_hook_suffix = add_options_page( 
             __('{plugin-name} Options', '{plugin-slug}'),     /* The title of the page when the menu is selected */
             __('{plugin-name}', '{plugin-slug}'),/* The text for the menu */
-            'manage_options',                              /* capability required for this menu to be displayed to user */
+            {plugin-class-name}_Info::$capability_for_settings, /* capability required for this menu to be displayed to user */
             {plugin-class-name}_Info::settings_page_slug , /* menu slug that is used when adding setting sections */
             array($this, 'add_options_page')               /* callback to output the content for this page */
           );
@@ -91,11 +91,11 @@ class {plugin-class-name}_Admin
    */
   public function enqueue_admin_styles($screen_suffix) {
     // Return early if no settings page is registered
-    if ( ! isset( $this->plugin_screen_hook_suffix ) ) {
+    if ( ! isset( $this->screen_hook_suffix ) ) {
       return;
     }
 
-    if ( $screen_suffix == $this->plugin_screen_hook_suffix ) {
+    if ( $screen_suffix == $this->screen_hook_suffix ) {
       wp_enqueue_style( {plugin-class-name}_Info::slug .'-admin-styles',
                         {plugin-class-name}_Info::$plugin_url . '/assets/css/admin.css', 
                         array(),
@@ -112,11 +112,11 @@ class {plugin-class-name}_Admin
    */
   public function enqueue_admin_scripts($screen_suffix) {
     // Return early if no settings page is registered
-    if ( ! isset( $this->plugin_screen_hook_suffix ) ) {
+    if ( ! isset( $this->screen_hook_suffix ) ) {
       return;
     }
 
-    if ( $screen_suffix == $this->plugin_screen_hook_suffix ) {
+    if ( $screen_suffix == $this->screen_hook_suffix ) {
       wp_enqueue_script( {plugin-class-name}_Info::slug . '-admin-script', 
                          {plugin-class-name}_Info::$plugin_url . '/assets/js/admin.js',
                          array( 'jquery' ),

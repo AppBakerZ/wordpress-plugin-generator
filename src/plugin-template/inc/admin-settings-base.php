@@ -13,7 +13,7 @@ class {plugin-class-name}_Admin_Base {
    * @since    0.1.0
    * @var      string
    */
-  protected $plugin_screen_hook_suffix = null;
+  protected $screen_hook_suffix = null;
 
   protected $settings = null;
 

@@ -12,6 +12,7 @@ class {plugin-class-name}_Custom_Post_Base {
    */
   protected $post_type = '';
   protected $prefix = '';
+  protected $post_name_singular = '';
 
   private static $styles_registered = false;
   protected static $styles = array('{plugin-slug}-custom-post-base');
@@ -26,24 +27,39 @@ class {plugin-class-name}_Custom_Post_Base {
     //Add hook for adding meta box
     add_action('add_meta_boxes', array($this, 'handle_add_meta_boxes_base'));
 
+    //Change the status message while updating the postda
+    add_filter('post_updated_messages', array($this, 'handle_post_updated_messages'));
+  }
+
+  /**
+   * Initializes the post_meta_data instance field
+   */
+  protected function set_post_meta_data() {
+    global $post;
+
+    $saved_post_meta_data = get_post_meta($post->ID, $this->prefix);
+
+    if (isset($saved_post_meta_data[0])) {
+      $this->post_meta_data = $saved_post_meta_data[0];
+    }
+    else {
+      $this->post_meta_data = array();
+    }
+
+    $default_values = $this->get_default_values();
+
+    foreach ($default_values as $key => $values) {
+      if (!isset($this->post_meta_data[$key])) {
+        $this->post_meta_data[$key] = $default_values[$key];
+      }
+    }
   }
 
   /*
    * Handles add_meta_boxes action
    * */
   public function handle_add_meta_boxes_base() {
-
-    global $post;
-
-    $saved_post_meta_data = get_post_meta($post->ID, $this->prefix);
-    $this->post_meta_data = $saved_post_meta_data[0];
-
-    $default_values = $this->get_default_values();
-    foreach ($default_values as $key => $values) {
-      if (!isset($this->post_meta_data[$key])) {
-        $this->post_meta_data[$key] = $default_values[$key];
-      }
-    }
+    $this->set_post_meta_data();
 
     // delegate to child class 
     $this->add_meta_boxes();
@@ -57,13 +73,13 @@ class {plugin-class-name}_Custom_Post_Base {
 
     // To add a custom class to metabox: http://wordpress.stackexchange.com/questions/49773/how-to-add-a-class-to-meta-box
     // In general, the hook is postbox_classes_{$page}_{$meta_box_id}
-    add_filter("postbox_classes_" . $this->post_type . "_$markup_id", array($this, 'add_metabox_classes'));
+    add_filter("postbox_classes_" . $this->post_type . "_$markup_id", array($this, 'handle_postbox_classes'));
   }
 
   /**
-  * Handles add_metabox_classes filter 
+  * Handles postbox_classes_{$page}_{$meta_box_id} filter 
   */
-  public function add_metabox_classes($classes){
+  public function handle_postbox_classes($classes){
     // Add a common css class to all our meta boxes
     array_push($classes, {plugin-class-name}_Info::slug . '-metabox');
     return $classes;
@@ -75,7 +91,7 @@ class {plugin-class-name}_Custom_Post_Base {
   public function handle_save_post_base($post_id) {
 
     // Only handle the save of our custom post
-    if ($this->post_type != $_POST['post_type']) {
+    if (!isset($_POST['post_type']) || $this->post_type != $_POST['post_type']) {
       return;
     }
 
@@ -114,6 +130,12 @@ class {plugin-class-name}_Custom_Post_Base {
     // TODO: template - raise exception to enforce override
     return array();
   }
+
+  public function handle_post_updated_messages($messages) {
+    // TODO: template - raise exception to enforce override
+    return $messages;    
+  }
+
 
   /**
    * Child classes must override add_meta_boxes to add metaboxes 

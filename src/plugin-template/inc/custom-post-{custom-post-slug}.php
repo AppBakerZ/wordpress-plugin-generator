@@ -32,7 +32,7 @@ class {plugin-class-name}_{custom-post-class-name}_Custom_Post
     $this->register_script_and_style();
 
     //Add hook for admin admin style sheet and javascript.
-    add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles_and_scripts'));
+    add_action('admin_enqueue_scripts', array($this, 'handle_admin_enqueue_scripts'));
 
   }
 
@@ -93,7 +93,7 @@ class {plugin-class-name}_{custom-post-class-name}_Custom_Post
          capabilities. May be passed as an array to allow for alternative plurals when using this
          argument as a base to construct the capabilities.
          Default: "post" */
-      'capability_type' => 'post', 
+      'capability_type' => {plugin-class-name}_Info::$capability_for_custom_post, 
 
       /* (boolean or string) (optional) Enables post type archives.
       Will use $post_type as archive slug by default.
@@ -155,6 +155,35 @@ class {plugin-class-name}_{custom-post-class-name}_Custom_Post
 
 
   /**
+   * Handles post_updated_messages filter. This filter is added in base class. 
+   *
+   */
+  public function handle_post_updated_messages($messages) {
+    
+    global $post, $post_ID;
+
+    $messages[$this->post_type] = array(
+      0 => '', // Unused. Messages start at index 1.
+      1 => sprintf(__('{custom-post-name-singular} updated. <a href="%s">View {custom-post-name-singular}</a>', '{plugin-slug}'), esc_url(get_permalink($post_ID))),
+      2 => __('{custom-post-name-singular} updated', '{plugin-slug}'),
+      3 => __('{custom-post-name-singular} deleted', '{plugin-slug}'),
+      4 => __('{custom-post-name-singular} updated', '{plugin-slug}'),
+      /* translators: %s: date and time of the revision */
+      5 => isset($_GET['revision']) ? sprintf(__('{custom-post-name-singular} restored to revision from %s', '{plugin-slug}'), wp_post_revision_title((int)$_GET['revision'], false)) : false,
+      6 => sprintf(__('{custom-post-name-singular} published. <a href="%s">View {custom-post-name-singular}</a>', '{plugin-slug}'), esc_url(get_permalink($post_ID))),
+      7 => __('{custom-post-name-singular} saved.', '{plugin-slug}'),
+      8 => sprintf(__('{custom-post-name-singular} submitted <a target="_blank" href="%s">Preview {custom-post-name-singular}</a>', '{plugin-slug}'), esc_url(add_query_arg('preview', 'true', get_permalink($post_ID)))),
+      9 => sprintf(__('{custom-post-name-singular} scheduled for: <strong>%1$s</strong>. <a target="_blank" href="%2$s">Preview {custom-post-name-singular}</a>', '{plugin-slug}'),
+        // translators: Publish box date format, see php.net/date
+        date_i18n(__('M j, Y @ G:i'), strtotime($post->post_date)), esc_url(get_permalink($post_ID))),
+      10 => sprintf(__('{custom-post-name-singular} draft updated. <a target="_blank" href="%s">Preview {custom-post-name-singular}</a>', '{plugin-slug}'), esc_url(add_query_arg('preview', 'true', get_permalink($post_ID)))),
+    );
+
+    return $messages;
+
+  }
+
+  /**
    * Register script and stylesheet for custom post admin page.
    * These would be enqueued later only when necessary.
    *
@@ -175,7 +204,7 @@ class {plugin-class-name}_{custom-post-class-name}_Custom_Post
                       {plugin-class-name}_Info::version );
   }
 
-  public function enqueue_admin_styles_and_scripts($screen_suffix) {
+  public function handle_admin_enqueue_scripts($screen_suffix) {
     //Access the global $wp_version variable to see which version of WordPress is installed.
     global $wp_version;
     global $post;
